@@ -1,0 +1,12 @@
+/* Storybook-specific styles */
+
+/* Ensure Storybook canvas respects themes */
+#storybook-root {
+  min-height: 100vh;
+}
+
+/* Remove any default margins/padding */
+body {
+  margin: 0;
+  padding: 0;
+}

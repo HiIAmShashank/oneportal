@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.turbo/
+dist-deploy/
+
+# Coverage
+coverage/
+
+# Lock files (preserve exact formatting)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+*.tsbuildinfo
+
+# Turbo generators backup
+turbo/generators.backup*/

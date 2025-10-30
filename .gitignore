@@ -1,0 +1,73 @@
+node_modules
+dist
+.turbo
+.specify
+speckit.*
+
+# pnpm
+.pnpm-store
+
+# Build artifacts (should not be committed)
+*.tsbuildinfo
+dist-deploy
+.vite
+
+# Ignore all markdown files
+*.md
+
+# Except README files (case-insensitive)
+!README.md
+!readme.md
+!Readme.md
+
+# Environment files
+.env.*
+.env
+.env.local
+.env.*.local
+
+# Act (GitHub Actions local testing)
+.secrets
+act-artifacts
+act-cache
+**/.ignored_vite
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Turbo
+turbo/generators.backup*
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+*.txt
+.specify/*
+.specify/memory/constitution.md
+.specify/templates/plan-template.md
+.specify/templates/spec-template.md
+.specify/templates/tasks-template.md
+packages/auth/tsconfig.tsbuildinfo
+tsconfig.tsbuildinfo
+apps/shell/tsconfig.tsbuildinfo
+# Storybook
+apps/storybook/node_modules/*
+apps/storybook/.cache
+storybook-static
+
+# Keep CLAUDE.md
+!CLAUDE.md

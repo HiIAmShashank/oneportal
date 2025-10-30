@@ -1,0 +1,33 @@
+/**
+ * Sidebar overrides for micro-frontend container mode
+ * 
+ * The default shadcn sidebar uses fixed positioning with full viewport height,
+ * which doesn't work for micro-frontends embedded in a shell.
+ * These overrides make the sidebar contained within the app container.
+ */
+
+/* Override SidebarProvider to use container height instead of viewport height */
+.group\/sidebar-wrapper {
+    min-height: 100% !important;
+    height: 100%;
+}
+
+/* Override desktop sidebar to use absolute positioning within container instead of fixed viewport */
+@media (min-width: 768px) {
+
+    /* The fixed sidebar content wrapper */
+    .group.peer[data-state]>div:last-child {
+        position: absolute !important;
+        height: 100% !important;
+    }
+
+    /* Ensure the spacer div properly transitions width on collapse */
+    .group.peer[data-state][data-collapsible="icon"]>div:first-of-type {
+        width: var(--sidebar-width-icon) !important;
+    }
+
+    /* Ensure the fixed content div properly transitions width on collapse */
+    .group.peer[data-state][data-collapsible="icon"]>div:last-child {
+        width: var(--sidebar-width-icon) !important;
+    }
+}

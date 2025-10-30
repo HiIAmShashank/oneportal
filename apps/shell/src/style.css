@@ -1,0 +1,12 @@
+/*
+ * Shell App - Custom Styles
+ *
+ * This file is for app-specific custom CSS.
+ * Theme variables are defined in packages/ui/src/theme.css
+ * and imported via app.css.
+ *
+ * Use this file for:
+ * - App-specific animations or keyframes
+ * - Custom component styles not in the UI package
+ * - One-off overrides (use sparingly)
+ */

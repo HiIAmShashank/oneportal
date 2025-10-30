@@ -1,0 +1,88 @@
+{
+    "$schema": "https://unpkg.com/knip@5/schema.json",
+    "workspaces": {
+        ".": {
+            "entry": [
+                "scripts/*.js"
+            ],
+            "project": [
+                "scripts/**/*.js"
+            ]
+        },
+        "apps/*": {
+            "entry": [
+                "src/main.tsx",
+                "src/bootstrap.tsx"
+            ],
+            "project": [
+                "src/**/*.{ts,tsx}"
+            ]
+        },
+        "packages/auth": {
+            "entry": [
+                "src/index.ts"
+            ],
+            "project": [
+                "src/**/*.{ts,tsx}"
+            ]
+        },
+        "packages/config": {
+            "entry": [
+                "eslint/**/*.{js,cjs,mjs}"
+            ],
+            "project": [
+                "eslint/**/*.{js,cjs,mjs}"
+            ]
+        },
+        "packages/types": {
+            "entry": [
+                "src/index.ts"
+            ],
+            "project": [
+                "src/**/*.{ts,tsx}"
+            ]
+        },
+        "packages/ui": {
+            "entry": [
+                "src/index.ts"
+            ],
+            "project": [
+                "src/**/*.{ts,tsx}"
+            ]
+        }
+    },
+    "ignore": [
+        "**/*.d.ts",
+        "**/vite-env.d.ts",
+        "**/routeTree.gen.ts",
+        "**/*eslint.config.*",
+        "**/vite.config.ts",
+        "**/tailwind.config.*",
+        "**/postcss.config.*",
+        "**/tsconfig*.json",
+        "**/__tests__/**",
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}",
+        "**/dist/**",
+        "**/build/**",
+        "**/node_modules/**",
+        "scripts/**"
+    ],
+    "ignoreDependencies": [
+        "@originjs/vite-plugin-federation",
+        "@tailwindcss/cli",
+        "@tailwindcss/vite",
+        "vite",
+        "typescript",
+        "eslint",
+        "@tanstack/router-plugin",
+        "@tanstack/router-cli",
+        "tailwindcss",
+        "postcss",
+        "autoprefixer"
+    ],
+    "ignoreBinaries": [
+        "docker-compose"
+    ],
+    "ignoreExportsUsedInFile": true
+}

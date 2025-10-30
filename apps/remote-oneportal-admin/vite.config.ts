@@ -1,0 +1,63 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import federation from "@originjs/vite-plugin-federation";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
+import tailwindcss from "@tailwindcss/vite";
+
+export default defineConfig({
+  plugins: [
+    tanstackRouter(),
+    react(),
+    tailwindcss(),
+    federation({
+      name: "oneportal-admin",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./App": "./src/App.tsx",
+        "./bootstrap": "./src/bootstrap.tsx",
+      },
+      shared: {
+        react: {
+          singleton: true,
+          requiredVersion: "^19.2.0",
+        },
+        "react-dom": {
+          singleton: true,
+          requiredVersion: "^19.2.0",
+        },
+        "@tanstack/react-query": {
+          singleton: true,
+        },
+        "@tanstack/react-router": {
+          singleton: true,
+        },
+        "lucide-react": {
+          singleton: true,
+        },
+      },
+    }),
+  ],
+  base: process.env.NODE_ENV === "production" ? "/oneportal-admin/" : "/",
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
+  preview: {
+    port: 4173,
+    strictPort: true,
+  },
+  build: {
+    modulePreload: false,
+    target: "esnext",
+    minify: true,
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        format: "esm",
+        entryFileNames: "assets/[name].js",
+        chunkFileNames: "assets/[name].js",
+        assetFileNames: "assets/[name].[ext]",
+      },
+    },
+  },
+});

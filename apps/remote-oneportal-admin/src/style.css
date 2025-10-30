@@ -1,0 +1,9 @@
+/*
+ * Custom app-specific styles
+ *
+ * This file is for custom CSS that's specific to this app.
+ * Do NOT import Tailwind CSS here - that's handled in app.css
+ *
+ * If you need CSS variables, add them here.
+ * If you need custom animations or keyframes, add them here.
+ */

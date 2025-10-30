@@ -1,0 +1,198 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MSAL Configuration Schema",
+  "description": "Environment-based configuration schema for MSAL PublicClientApplication in OnePortal micro-frontends",
+  "type": "object",
+  "required": ["auth", "cache"],
+  "properties": {
+    "auth": {
+      "type": "object",
+      "description": "Authentication configuration",
+      "required": ["clientId", "authority", "redirectUri"],
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "Azure AD application (client) ID - unique per app (Shell/Remote)",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "examples": [
+            "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+          ]
+        },
+        "authority": {
+          "type": "string",
+          "description": "Azure AD tenant authority URL",
+          "pattern": "^https://login\\.microsoftonline\\.com/[0-9a-f-]+$",
+          "examples": [
+            "https://login.microsoftonline.com/common",
+            "https://login.microsoftonline.com/12345678-1234-1234-1234-123456789012"
+          ]
+        },
+        "redirectUri": {
+          "type": "string",
+          "description": "Post-authentication redirect URI (must be registered in Azure AD)",
+          "format": "uri",
+          "examples": [
+            "http://localhost:5173/auth/callback",
+            "https://myapp.azurestaticapps.net/auth/callback",
+            "http://localhost:4280/billing/auth/callback"
+          ]
+        },
+        "postLogoutRedirectUri": {
+          "type": "string",
+          "description": "Post-sign-out redirect URI (optional, defaults to app root)",
+          "format": "uri",
+          "examples": [
+            "http://localhost:5173/",
+            "https://myapp.azurestaticapps.net/"
+          ]
+        },
+        "navigateToLoginRequestUrl": {
+          "type": "boolean",
+          "description": "Navigate to original request URL after authentication (for deep links)",
+          "default": true
+        },
+        "clientCapabilities": {
+          "type": "array",
+          "description": "Client capabilities for conditional access policies",
+          "items": {
+            "type": "string"
+          },
+          "examples": [
+            ["CP1"]
+          ]
+        }
+      }
+    },
+    "cache": {
+      "type": "object",
+      "description": "Token cache configuration",
+      "required": ["cacheLocation"],
+      "properties": {
+        "cacheLocation": {
+          "type": "string",
+          "enum": ["sessionStorage", "localStorage"],
+          "description": "Browser storage location for MSAL cache",
+          "default": "sessionStorage"
+        },
+        "storeAuthStateInCookie": {
+          "type": "boolean",
+          "description": "Store auth state in cookies (for IE11/Edge legacy, not needed for modern browsers)",
+          "default": false
+        },
+        "secureCookies": {
+          "type": "boolean",
+          "description": "Use secure cookies (requires HTTPS)",
+          "default": false
+        },
+        "claimsBasedCachingEnabled": {
+          "type": "boolean",
+          "description": "Enable claims-based caching for conditional access",
+          "default": false
+        }
+      }
+    },
+    "system": {
+      "type": "object",
+      "description": "MSAL system configuration",
+      "properties": {
+        "loggerOptions": {
+          "type": "object",
+          "properties": {
+            "loggerCallback": {
+              "type": "string",
+              "description": "Logger function reference (code, not JSON)",
+              "const": "Function"
+            },
+            "logLevel": {
+              "type": "integer",
+              "enum": [0, 1, 2, 3, 4],
+              "description": "0=Error, 1=Warning, 2=Info, 3=Verbose, 4=Trace",
+              "default": 2
+            },
+            "piiLoggingEnabled": {
+              "type": "boolean",
+              "description": "Log personally identifiable information (dev only)",
+              "default": false
+            }
+          }
+        },
+        "windowHashTimeout": {
+          "type": "integer",
+          "description": "Timeout for hash fragment parsing (ms)",
+          "default": 6000
+        },
+        "iframeHashTimeout": {
+          "type": "integer",
+          "description": "Timeout for iframe silent authentication (ms)",
+          "default": 6000
+        },
+        "loadFrameTimeout": {
+          "type": "integer",
+          "description": "Timeout for loading iframe (ms)",
+          "default": 0
+        },
+        "asyncPopups": {
+          "type": "boolean",
+          "description": "Use async popup flows (not recommended - use redirect)",
+          "default": false
+        },
+        "allowNativeBroker": {
+          "type": "boolean",
+          "description": "Allow native broker authentication (WAM on Windows)",
+          "default": false
+        }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "description": "Telemetry configuration",
+      "properties": {
+        "application": {
+          "type": "object",
+          "required": ["appName", "appVersion"],
+          "properties": {
+            "appName": {
+              "type": "string",
+              "description": "Application name for telemetry",
+              "examples": ["shell", "billing", "reports"]
+            },
+            "appVersion": {
+              "type": "string",
+              "description": "Application version",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$",
+              "examples": ["1.0.0", "2.1.3"]
+            }
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "auth": {
+        "clientId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "authority": "https://login.microsoftonline.com/common",
+        "redirectUri": "http://localhost:5173/auth/callback",
+        "postLogoutRedirectUri": "http://localhost:5173/",
+        "navigateToLoginRequestUrl": true
+      },
+      "cache": {
+        "cacheLocation": "sessionStorage",
+        "storeAuthStateInCookie": false
+      },
+      "system": {
+        "loggerOptions": {
+          "logLevel": 2,
+          "piiLoggingEnabled": false
+        },
+        "allowNativeBroker": false
+      },
+      "telemetry": {
+        "application": {
+          "appName": "shell",
+          "appVersion": "1.0.0"
+        }
+      }
+    }
+  ]
+}

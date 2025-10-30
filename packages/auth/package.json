@@ -1,0 +1,40 @@
+{
+  "name": "@one-portal/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./events": "./src/events/index.ts",
+    "./contexts": "./src/contexts/index.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./guards": "./src/guards/index.ts",
+    "./guards/presets": "./src/guards/presets.ts",
+    "./utils": "./src/utils/index.ts",
+    "./config": "./src/config/index.ts",
+    "./factory": "./src/factory/createMsalInstance.ts",
+    "./errors": "./src/errors/index.ts",
+    "./providers": "./src/providers/index.ts",
+    "./utils/acquireToken": "./src/utils/acquireToken.ts",
+    "./api/GraphClient": "./src/api/GraphClient.ts"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@azure/msal-browser": "^3.0.0",
+    "@azure/msal-react": "^2.2.0",
+    "@one-portal/ui": "workspace:*",
+    "lucide-react": "^0.545.0",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@one-portal/config": "workspace:*",
+    "@types/react": "^19.0.0",
+    "eslint": "^9.37.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.1.9"
+  }
+}

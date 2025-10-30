@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noUncheckedSideEffectImports": true,
+
+    /* Path Mappings for Workspace Packages */
+    "baseUrl": ".",
+    "paths": {
+      "@one-portal/auth": ["../../packages/auth/src/index.ts"],
+      "@one-portal/auth/*": ["../../packages/auth/src/*"],
+      "@one-portal/config": ["../../packages/config/src/index.ts"],
+      "@one-portal/config/*": ["../../packages/config/src/*"],
+      "@one-portal/types": ["../../packages/types/src/index.ts"],
+      "@one-portal/types/*": ["../../packages/types/src/*"],
+      "@one-portal/ui": ["../../packages/ui/src/index.ts"],
+      "@one-portal/ui/*": ["../../packages/ui/src/*"]
+    }
+  },
+  "include": ["src"]
+}

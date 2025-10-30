@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    /* Build output */
+    "noEmit": true,
+
+    /* Path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@one-portal/ui": ["../../packages/ui/src"],
+      "@one-portal/ui/*": ["../../packages/ui/src/*"],
+      "@one-portal/types": ["../../packages/types/src"],
+      "@one-portal/auth": ["../../packages/auth/src"],
+      "@one-portal/auth/*": ["../../packages/auth/src/*"],
+      "@one-portal/config": ["../../packages/config/src"],
+      "@one-portal/config/*": ["../../packages/config/src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/types" },
+    { "path": "../../packages/auth" },
+    { "path": "../../packages/config" }
+  ]
+}

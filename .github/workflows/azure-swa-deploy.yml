@@ -1,0 +1,142 @@
+name: Azure Static Web Apps CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "22.x"
+  PNPM_VERSION: "10.19.0"
+
+jobs:
+  # Build and deploy job
+  build-and-deploy:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        if: ${{ !env.ACT }}
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        if: ${{ !env.ACT }}
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create environment files dynamically
+        run: node scripts/generate-env-files.js
+        env:
+          # Shared secrets
+          TENANT_ID: ${{ secrets.TENANT_ID }}
+          ADMIN_API_BASE_URL: ${{ secrets.ADMIN_API_BASE_URL }}
+          APP_MODE: ${{ secrets.APP_MODE }}
+
+          # Shell app secrets
+          SHELL_AUTH_CLIENT_ID: ${{ secrets.SHELL_AUTH_CLIENT_ID }}
+          SHELL_AUTH_REDIRECT_URI: ${{ secrets.SHELL_AUTH_REDIRECT_URI }}
+          SHELL_AUTH_SCOPES: ${{ secrets.SHELL_AUTH_SCOPES }}
+
+          # Domino app secrets
+          DOMINO_AUTH_CLIENT_ID: ${{ secrets.DOMINO_AUTH_CLIENT_ID }}
+          DOMINO_AUTH_REDIRECT_URI: ${{ secrets.DOMINO_AUTH_REDIRECT_URI }}
+          DOMINO_AUTH_SCOPES: ${{ secrets.DOMINO_AUTH_SCOPES }}
+
+          # OnePortal Admin app secrets
+          ONEPORTAL_ADMIN_AUTH_CLIENT_ID: ${{ secrets.ONEPORTAL_ADMIN_AUTH_CLIENT_ID }}
+          ONEPORTAL_ADMIN_AUTH_REDIRECT_URI: ${{ secrets.ONEPORTAL_ADMIN_AUTH_REDIRECT_URI }}
+          ONEPORTAL_ADMIN_AUTH_SCOPES: ${{ secrets.ONEPORTAL_ADMIN_AUTH_SCOPES }}
+
+      - name: Build all apps
+        run: pnpm build
+        env:
+          NODE_ENV: production
+
+      - name: Combine builds for deployment
+        run: node scripts/combine-builds.js
+
+      - name: Verify deployment structure
+        run: |
+          echo "Deployment structure:"
+          ls -la dist-deploy/
+          echo ""
+          echo "Shell assets:"
+          ls -la dist-deploy/assets/ || echo "No shell assets found"
+          echo ""
+          echo "Domino remote:"
+          ls -la dist-deploy/domino/assets/ || echo "No domino assets found"
+          echo ""
+          echo "OnePortal Admin remote:"
+          ls -la dist-deploy/oneportal-admin/assets/ || echo "No admin assets found"
+
+      - name: Deploy to Azure Static Web Apps
+        id: deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "dist-deploy"
+          skip_app_build: true
+          skip_api_build: true
+          output_location: ""
+
+      - name: Upload deployment artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-build
+          path: dist-deploy/
+          retention-days: 30
+
+  # Close pull request job
+  close-pull-request:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    name: Close Pull Request
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: "close"
+          app_location: "dist-deploy"

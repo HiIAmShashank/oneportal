@@ -1,0 +1,35 @@
+/**
+ * Font Face Declarations
+ *
+ * Proxima Nova font family with three weights:
+ * - Light (300)
+ * - Regular (400)
+ * - Bold (700)
+ *
+ * Font files are located in each app's public/fonts/ directory
+ * and will be copied to dist/fonts/ during build.
+ */
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/fonts/proximanova_light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/fonts/proximanova_regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/fonts/proximanova_bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

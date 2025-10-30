@@ -1,0 +1,81 @@
+/* Set source base path to monorepo root (3 levels up from this file) */
+@import "tailwindcss" source("../../..");
+
+/* ============================================
+   Dark Mode - Class-Based Strategy
+   ============================================
+   Uses Tailwind Vite plugin which supports @custom-variant
+   The dark variant targets elements when .dark class is present
+   on any ancestor (typically <html> or <body>)
+   ============================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   Scan all apps and packages from monorepo root
+   ============================================
+   Glob patterns scan:
+   - All apps: shell, remote-domino, storybook
+   - All packages: ui, auth, config, types
+
+   This generates comprehensive CSS with all
+   utility classes used anywhere in the monorepo.
+   ============================================ */
+
+/* Scan all app source code */
+@source "apps/*/src/**/*.{ts,tsx}";
+
+/* Scan all package source code */
+@source "packages/*/src/**/*.{ts,tsx}";
+
+/* Performance: Exclude test/config/type definition files */
+@source not "**/*.test.{ts,tsx}";
+@source not "**/*.spec.{ts,tsx}";
+@source not "**/*.config.{ts,tsx}";
+@source not "**/*.d.ts";
+
+@import "./theme.css";
+@import "tw-animate-css";
+
+:root {
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Base styles - Using direct properties for better HMR support */
+* {
+  border-color: var(--color-border);
+  outline-color: color-mix(in srgb, var(--color-ring) 50%, transparent);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}

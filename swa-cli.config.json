@@ -1,0 +1,13 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "oneportal": {
+      "appLocation": ".",
+      "outputLocation": "dist-deploy",
+      "appDevserverUrl": "http://localhost:5173",
+      "appBuildCommand": "pnpm build:deploy",
+      "host": "0.0.0.0",
+      "port": 4280
+    }
+  }
+}

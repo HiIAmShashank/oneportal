@@ -1,0 +1,124 @@
+/**
+ * Authentication debugging utilities for Domino remote app
+ *
+ * Usage in browser console:
+ * ```
+ * // @ts-ignore
+ * window.debugAuth()
+ * ```
+ */
+
+import { msalInstance, getAuthConfig } from "../auth/msalInstance";
+
+export function debugAuth() {
+  console.info("Domino Authentication Debug");
+
+  // 1. Check active account
+  const account = msalInstance.getActiveAccount();
+  console.info(
+    "Active Account:",
+    account ? account.username : "No active account",
+  );
+
+  if (account) {
+    console.info("   - Name:", account.name);
+    console.info("   - Home Account ID:", account.homeAccountId);
+    console.info("   - Environment:", account.environment);
+  }
+
+  // 2. Check all accounts
+  const allAccounts = msalInstance.getAllAccounts();
+  console.info(`All Accounts (${allAccounts.length}):`, allAccounts);
+
+  // 3. Check configuration
+  const config = getAuthConfig();
+  console.info("⚙️  Auth Config:");
+  console.info("   - App Name:", config.appName);
+  console.info("   - Client ID:", config.clientId);
+  console.info("   - Authority:", config.authority);
+  console.info("   - Redirect URI:", config.redirectUri);
+  console.info("   - Scopes:", config.scopes);
+  console.info("   - Mode:", config.mode);
+
+  // 4. Check localStorage for tokens
+  const accessTokenKeys = Object.keys(localStorage).filter(
+    (key) => key.includes("accesstoken") && key.includes(config.clientId),
+  );
+
+  console.info(
+    `Access Tokens for Client ID (${accessTokenKeys.length}):`,
+    accessTokenKeys,
+  );
+
+  if (accessTokenKeys.length > 0) {
+    accessTokenKeys.forEach((key) => {
+      try {
+        const tokenData = JSON.parse(localStorage.getItem(key) || "{}");
+        console.info(`   Token: ${key}`);
+        console.info("   - Client ID:", tokenData.clientId);
+        console.info("   - Scopes:", tokenData.target);
+        console.info(
+          "   - Expires:",
+          new Date(parseInt(tokenData.expiresOn) * 1000).toLocaleString(),
+        );
+        console.info(
+          "   - Cached At:",
+          new Date(parseInt(tokenData.cachedAt) * 1000).toLocaleString(),
+        );
+
+        // Decode JWT
+        if (tokenData.secret) {
+          const parts = tokenData.secret.split(".");
+          if (parts.length === 3) {
+            const payload = JSON.parse(
+              atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")),
+            );
+            console.info("   - JWT aud (audience):", payload.aud);
+            console.info("   - JWT appid:", payload.appid);
+            console.info("   - JWT iss (issuer):", payload.iss);
+            console.info("   - JWT name:", payload.name);
+            console.info("   - JWT upn:", payload.upn);
+          }
+        }
+      } catch (e) {
+        console.error("   Failed to parse token:", e);
+      }
+    });
+  } else {
+    console.warn("WARNING: No access tokens found for this client ID");
+  }
+
+  // 5. Try to acquire token silently
+  console.info("\nAttempting to acquire token silently...");
+  if (account) {
+    msalInstance
+      .acquireTokenSilent({
+        scopes: config.scopes,
+        account: account,
+      })
+      .then((response) => {
+        console.info("✅ Token acquired successfully!");
+        console.info(
+          "   - Access Token (first 50 chars):",
+          response.accessToken.substring(0, 50) + "...",
+        );
+        console.info("   - Expires On:", response.expiresOn);
+        console.info("   - Scopes:", response.scopes);
+        console.info("   - Account:", response.account.username);
+      })
+      .catch((error) => {
+        console.error("Failed to acquire token:", error);
+      });
+  } else {
+    console.warn("WARNING: Cannot acquire token - no active account");
+  }
+}
+
+// Expose to window for easy console access
+if (typeof window !== "undefined") {
+  // @ts-expect-error - Intentionally adding debug utilities to window for development
+  window.debugAuth = debugAuth;
+  // @ts-expect-error - Intentionally adding MSAL instance to window for development
+  window.msalInstance = msalInstance;
+  console.info("Debug utilities loaded. Run window.debugAuth() in console.");
+}
