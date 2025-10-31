@@ -1,15 +1,56 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*/assets/*", "/*.js", "/*.css", "/*.json"]
+    "exclude": [
+      "/assets/*",
+      "/*/assets/*",
+      "/*.{js,mjs,css,json,map,woff,woff2,ttf,otf,svg,webp,ico,wasm}"
+    ]
   },
+  "routes": [
+    {
+      "route": "/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*.{woff2,woff,ttf,otf}",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "route": "/index.html",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate"
+      }
+    },
+    {
+      "route": "/*/index.html",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate"
+      }
+    }
+  ],
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
-    "X-XSS-Protection": "1; mode=block",
+    "X-XSS-Protection": "0",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.windows.net https://*.microsoft.com http://localhost:* https://*.microsoftonline.com https://login.microsoftonline.com; frame-src 'self' https://login.microsoftonline.com ; frame-src 'self' http://localhost:* ;frame-ancestors 'self' http://localhost:*;"
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "X-Permitted-Cross-Domain-Policies": "none",
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Cross-Origin-Resource-Policy": "same-origin",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.windows.net; font-src 'self' data:; connect-src 'self' https://*.azure-api.net https://graph.microsoft.com https://login.microsoftonline.com https://*.msidentity.com http://localhost:*; frame-src 'self' https://login.microsoftonline.com http://localhost:*; frame-ancestors 'self'; base-uri 'self'; worker-src 'self'; manifest-src 'self';"
   },
   "responseOverrides": {
     "404": {
@@ -20,7 +61,17 @@
   "mimeTypes": {
     ".json": "application/json",
     ".js": "text/javascript",
-    ".css": "text/css"
+    ".mjs": "text/javascript",
+    ".css": "text/css",
+    ".woff2": "font/woff2",
+    ".woff": "font/woff",
+    ".ttf": "font/ttf",
+    ".otf": "font/otf",
+    ".svg": "image/svg+xml",
+    ".webp": "image/webp",
+    ".ico": "image/x-icon",
+    ".map": "application/json",
+    ".wasm": "application/wasm"
   },
   "platform": {
     "apiRuntime": "node:20"
