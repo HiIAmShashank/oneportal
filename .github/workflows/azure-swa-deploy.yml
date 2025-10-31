@@ -92,20 +92,6 @@ jobs:
       - name: Combine builds for deployment
         run: node scripts/combine-builds.js
 
-      - name: Verify deployment structure
-        run: |
-          echo "Deployment structure:"
-          ls -la dist-deploy/
-          echo ""
-          echo "Shell assets:"
-          ls -la dist-deploy/assets/ || echo "No shell assets found"
-          echo ""
-          echo "Domino remote:"
-          ls -la dist-deploy/domino/assets/ || echo "No domino assets found"
-          echo ""
-          echo "OnePortal Admin remote:"
-          ls -la dist-deploy/oneportal-admin/assets/ || echo "No admin assets found"
-
       - name: Deploy to Azure Static Web Apps
         id: deploy
         uses: Azure/static-web-apps-deploy@v1
