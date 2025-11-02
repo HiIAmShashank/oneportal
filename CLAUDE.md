@@ -577,7 +577,7 @@ VITE_SHELL_AUTH_SCOPES=User.Read
 
 # API Configuration (app-specific)
 VITE_SHELL_API_BASE_URL=https://api.oneportal.com/shell
-VITE_SHELL_FUNCTIONAPP_API_BASE_URL=http://localhost:7071/api
+VITE_SHELL_ADMIN_FUNCTIONAPP_API_BASE_URL=http://localhost:7071/api
 
 # Shared variables
 VITE_APP_MODE=auto
@@ -1056,7 +1056,7 @@ useEffect(() => {
 - `src/api/constants.ts` - Endpoint definitions (factory functions)
 - `src/api/types.ts` - Request/response TypeScript types
 
-**Base URL:** `VITE_SHELL_FUNCTIONAPP_API_BASE_URL`
+**Base URL:** `VITE_SHELL_ADMIN_FUNCTIONAPP_API_BASE_URL`
 
 **Latest Changes (v1.0.1):**
 

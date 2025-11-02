@@ -2,7 +2,7 @@
  * OnePortal Backend API Client
  *
  * Provides authenticated API calls to the OnePortal Function App.
- * Base URL: VITE_SHELL_FUNCTIONAPP_API_BASE_URL
+ * Base URL: VITE_SHELL_ADMIN_FUNCTIONAPP_API_BASE_URL
  */
 
 import type { CheckSuperUserResponse, ApiApplicationsResponse } from "./types";
@@ -49,10 +49,12 @@ async function apiRequest<T>(
   token: string,
   options: ApiRequestOptions = {},
 ): Promise<T> {
-  const baseUrl = import.meta.env.VITE_SHELL_FUNCTIONAPP_API_BASE_URL;
+  const baseUrl = import.meta.env.VITE_SHELL_ADMIN_FUNCTIONAPP_API_BASE_URL;
 
   if (!baseUrl) {
-    throw new Error("VITE_SHELL_FUNCTIONAPP_API_BASE_URL is not configured");
+    throw new Error(
+      "VITE_SHELL_ADMIN_FUNCTIONAPP_API_BASE_URL is not configured",
+    );
   }
 
   const url = `${baseUrl}${endpoint}`;
