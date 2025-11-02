@@ -18,7 +18,7 @@ interface ImportMetaEnv {
 
   // API Configuration (app-specific)
   readonly VITE_SHELL_API_BASE_URL?: string;
-  readonly VITE_SHELL_ADMIN_FUNCTIONAPP_API_BASE_URL?: string;
+  readonly VITE_SHELL_FUNCTIONAPP_API_BASE_URL?: string;
 
   // Vite Standard Variables
   readonly DEV: boolean;

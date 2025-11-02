@@ -11,33 +11,69 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
+const APPS_DIR = path.join(ROOT_DIR, 'apps');
 const BUILD_DIR = path.join(ROOT_DIR, 'dist-deploy');
 
-const APPS = [
-  {
-    name: 'shell',
-    source: path.join(ROOT_DIR, 'apps/shell/dist'),
-    destination: BUILD_DIR, // Shell goes to root
-    description: 'Shell (Host Application)'
+/**
+ * Auto-discover apps from the apps directory
+ * @returns {Array} Array of app configurations
+ */
+function discoverApps() {
+  const apps = [];
+  const entries = fs.readdirSync(APPS_DIR, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+
+    const dirName = entry.name;
+    const packageJsonPath = path.join(APPS_DIR, dirName, 'package.json');
+
+    // Skip if no package.json
+    if (!fs.existsSync(packageJsonPath)) continue;
+
+    // Read package.json to check for exclusions
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+
+    // Skip storybook
+    if (packageJson.name === '@one-portal/storybook') continue;
+
+    // Handle shell (goes to root) vs remotes (go to subdirectories)
+    if (dirName === 'shell') {
+      apps.push({
+        name: 'shell',
+        source: path.join(APPS_DIR, 'shell', 'dist'),
+        destination: BUILD_DIR,
+        description: 'Shell (Host Application)'
+      });
+    } else if (dirName.startsWith('remote-')) {
+      // Extract app name by removing 'remote-' prefix
+      const appName = dirName.replace(/^remote-/, '');
+      const displayName = packageJson.name?.replace(/^@[^/]+\//, '').replace(/^remote-/, '');
+
+      apps.push({
+        name: appName,
+        source: path.join(APPS_DIR, dirName, 'dist'),
+        destination: path.join(BUILD_DIR, appName),
+        description: `${displayName.charAt(0).toUpperCase() + displayName.slice(1)} Remote App`
+      });
+    }
   }
-  ,
-  {
-    name: 'domino',
-    source: path.join(ROOT_DIR, 'apps/remote-domino/dist'),
-    destination: path.join(BUILD_DIR, 'domino'),
-    description: 'Domino Remote App'
-  }
-  ,
-  {
-    name: 'oneportal-admin',
-    source: path.join(ROOT_DIR, 'apps/remote-oneportal-admin/dist'),
-    destination: path.join(BUILD_DIR, 'oneportal-admin'),
-    description: 'One Portal Admin Remote App'
-  }
-];
+
+  return apps;
+}
 
 async function combineBuilds() {
   console.log('Starting build combination...\n');
+
+  // Auto-discover apps
+  const APPS = discoverApps();
+
+  if (APPS.length === 0) {
+    console.error('Error: No apps found in apps/ directory');
+    process.exit(1);
+  }
+
+  console.log(`Discovered ${APPS.length} app(s): ${APPS.map(a => a.name).join(', ')}\n`);
 
   // Step 1: Clean previous build
   console.log('Cleaning previous deployment build...');

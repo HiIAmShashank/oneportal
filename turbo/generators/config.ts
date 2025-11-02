@@ -68,20 +68,6 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         },
         skipIfExists: false,
       },
-      // Update scripts/combine-builds.js
-      {
-        type: "modify",
-        path: "{{ turbo.paths.root }}/scripts/combine-builds.js",
-        pattern: /(const APPS = \[[\s\S]*?)(\n\];)/,
-        template: `$1,
-  {
-    name: '{{ appName }}',
-    source: path.join(ROOT_DIR, 'apps/remote-{{ appName }}/dist'),
-    destination: path.join(BUILD_DIR, '{{ appName }}'),
-    description: '{{ displayName }} Remote App'
-  }
-$2`,
-      },
       // Custom action to display next steps
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function (answers: Record<string, any>) {
@@ -149,7 +135,7 @@ $2`,
         // eslint-disable-next-line no-console
         console.log("\nShell integration:");
         // eslint-disable-next-line no-console
-        console.log("   - Updated scripts/combine-builds.js");
+        console.log("   - Auto-discovered by scripts/combine-builds.js");
         // eslint-disable-next-line no-console
         console.log(
           "   Shell navigation is automatic via API (/applications endpoint)",

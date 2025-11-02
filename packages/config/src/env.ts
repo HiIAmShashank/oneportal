@@ -20,7 +20,7 @@ export const shellEnvSchema = z.object({
     .string()
     .url("Shell API Base URL must be a valid URL")
     .optional(),
-  VITE_SHELL_ADMIN_FUNCTIONAPP_API_BASE_URL: z
+  VITE_SHELL_FUNCTIONAPP_API_BASE_URL: z
     .string()
     .url("Admin Function App API Base URL must be a valid URL"),
 

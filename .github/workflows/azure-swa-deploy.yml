@@ -62,28 +62,35 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Create environment files dynamically
-        run: node scripts/generate-env-files.js
+        run: node scripts/write-env-files.js
         env:
-          # Shared secrets
-          TENANT_ID: ${{ secrets.TENANT_ID }}
-          ADMIN_API_BASE_URL: ${{ secrets.ADMIN_API_BASE_URL }}
-          APP_MODE: ${{ secrets.APP_MODE }}
+          VITE_APP_MODE: ${{ secrets.VITE_APP_MODE }}
 
           # Shell app secrets
-          SHELL_AUTH_CLIENT_ID: ${{ secrets.SHELL_AUTH_CLIENT_ID }}
-          SHELL_AUTH_REDIRECT_URI: ${{ secrets.SHELL_AUTH_REDIRECT_URI }}
-          SHELL_AUTH_SCOPES: ${{ secrets.SHELL_AUTH_SCOPES }}
+          VITE_SHELL_AUTH_CLIENT_ID: ${{ secrets.VITE_SHELL_AUTH_CLIENT_ID }}
+          VITE_SHELL_AUTH_AUTHORITY: ${{ secrets.VITE_SHELL_AUTH_AUTHORITY }}
+          VITE_SHELL_AUTH_REDIRECT_URI: ${{ secrets.VITE_SHELL_AUTH_REDIRECT_URI }}
+          VITE_SHELL_AUTH_SCOPES: ${{ secrets.VITE_SHELL_AUTH_SCOPES }}
+          VITE_SHELL_AUTH_POST_LOGOUT_REDIRECT_URI: ${{ secrets.VITE_SHELL_AUTH_POST_LOGOUT_REDIRECT_URI }}
+          VITE_SHELL_APP_NAME: ${{ secrets.VITE_SHELL_APP_NAME }}
+          VITE_SHELL_ADMIN_FUNCTIONAPP_API_BASE_URL: ${{ secrets.VITE_SHELL_ADMIN_FUNCTIONAPP_API_BASE_URL }}
 
           # Domino app secrets
-          DOMINO_AUTH_CLIENT_ID: ${{ secrets.DOMINO_AUTH_CLIENT_ID }}
-          DOMINO_AUTH_REDIRECT_URI: ${{ secrets.DOMINO_AUTH_REDIRECT_URI }}
-          DOMINO_AUTH_SCOPES: ${{ secrets.DOMINO_AUTH_SCOPES }}
+          VITE_DOMINO_AUTH_CLIENT_ID: ${{ secrets.VITE_DOMINO_AUTH_CLIENT_ID }}
+          VITE_DOMINO_AUTH_AUTHORITY: ${{ secrets.VITE_DOMINO_AUTH_AUTHORITY }}
+          VITE_DOMINO_AUTH_REDIRECT_URI: ${{ secrets.VITE_DOMINO_AUTH_REDIRECT_URI }}
+          VITE_DOMINO_AUTH_SCOPES: ${{ secrets.VITE_DOMINO_AUTH_SCOPES }}
+          VITE_DOMINO_AUTH_POST_LOGOUT_REDIRECT_URI: ${{ secrets.VITE_DOMINO_AUTH_POST_LOGOUT_REDIRECT_URI }}
+          VITE_DOMINO_APP_NAME: ${{ secrets.VITE_DOMINO_APP_NAME }}
 
           # OnePortal Admin app secrets
-          ONEPORTAL_ADMIN_AUTH_CLIENT_ID: ${{ secrets.ONEPORTAL_ADMIN_AUTH_CLIENT_ID }}
-          ONEPORTAL_ADMIN_AUTH_REDIRECT_URI: ${{ secrets.ONEPORTAL_ADMIN_AUTH_REDIRECT_URI }}
-          ONEPORTAL_ADMIN_AUTH_SCOPES: ${{ secrets.ONEPORTAL_ADMIN_AUTH_SCOPES }}
-
+          VITE_ONEPORTAL_ADMIN_AUTH_CLIENT_ID: ${{ secrets.VITE_ONEPORTAL_ADMIN_AUTH_CLIENT_ID }}
+          VITE_ONEPORTAL_ADMIN_AUTH_AUTHORITY: ${{ secrets.VITE_ONEPORTAL_ADMIN_AUTH_AUTHORITY }}
+          VITE_ONEPORTAL_ADMIN_AUTH_REDIRECT_URI: ${{ secrets.VITE_ONEPORTAL_ADMIN_AUTH_REDIRECT_URI }}
+          VITE_ONEPORTAL_ADMIN_AUTH_SCOPES: ${{ secrets.VITE_ONEPORTAL_ADMIN_AUTH_SCOPES }}
+          VITE_ONEPORTAL_ADMIN_AUTH_POST_LOGOUT_REDIRECT_URI: ${{ secrets.VITE_ONEPORTAL_ADMIN_AUTH_POST_LOGOUT_REDIRECT_URI }}
+          VITE_ONEPORTAL_ADMIN_APP_NAME: ${{ secrets.VITE_ONEPORTAL_ADMIN_APP_NAME }}
+          VITE_ONEPORTAL_ADMIN_FUNCTIONAPP_API_BASE_URL: ${{ secrets.VITE_ONEPORTAL_ADMIN_FUNCTIONAPP_API_BASE_URL }}
       - name: Build all apps
         run: pnpm build
         env:

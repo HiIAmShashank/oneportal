@@ -26,8 +26,11 @@ dist-deploy
 .env.local
 .env.*.local
 
-# Act (GitHub Actions local testing)
+# Secrets files (for local testing)
 .secrets
+.secrets.local
+
+# Act (GitHub Actions local testing)
 act-artifacts
 act-cache
 **/.ignored_vite

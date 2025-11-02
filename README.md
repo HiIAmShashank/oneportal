@@ -530,7 +530,7 @@ See **`docs/ONEPORTAL_ADMIN_FEATURES.md`**
 
 ### API Integration
 
-**Base URL:** `VITE_SHELL_ADMIN_FUNCTIONAPP_API_BASE_URL`
+**Base URL:** `VITE_SHELL_FUNCTIONAPP_API_BASE_URL`
 
 **Key Changes (v1.0.1):**
 
