@@ -1,9 +1,10 @@
 import { createRootRoute, Outlet, redirect } from "@tanstack/react-router";
 import { createProtectedRouteGuard } from "@one-portal/auth/guards";
-import { safeRedirect } from "@one-portal/auth/utils";
+import { safeRedirect, isEmbeddedMode } from "@one-portal/auth/utils";
 import { acquireToken } from "@one-portal/auth/utils/acquireToken";
 import { msalInstance, getAuthConfig } from "../auth/msalInstance";
 import { AppLayout } from "../components/AppLayout";
+import { ThemeProvider } from "../components/ThemeProvider";
 import { PUBLIC_ROUTES } from "../config/routes";
 import { checkSuperUser } from "../api";
 
@@ -59,9 +60,24 @@ export const Route = createRootRoute({
     const isPublicRoute = (PUBLIC_ROUTES as readonly string[]).includes(
       pathname,
     );
+    const isStandalone = !isEmbeddedMode({
+      mode: import.meta.env.VITE_APP_MODE as "auto" | "standalone" | "embedded",
+    });
 
     if (isPublicRoute) {
       return <Outlet />;
+    }
+
+    // In standalone mode, provide our own ThemeProvider
+    // In embedded mode, Shell provides the ThemeProvider
+    if (isStandalone) {
+      return (
+        <ThemeProvider defaultTheme="system" storageKey="one-portal-ui-theme">
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        </ThemeProvider>
+      );
     }
 
     return (

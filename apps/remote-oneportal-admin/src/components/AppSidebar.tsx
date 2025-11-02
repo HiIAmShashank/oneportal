@@ -21,9 +21,11 @@ import {
   CollapsibleTrigger,
 } from "@one-portal/ui";
 import { AuthContext } from "@one-portal/auth";
+import { isEmbeddedMode } from "@one-portal/auth/utils";
 import { menuItems } from "../config/menu";
 import type { MenuItem } from "../types/menu";
 import { DynamicIcon } from "./DynamicIcon";
+import { ThemeToggle } from "./ThemeToggle";
 
 /**
  * Render a single menu item with optional children
@@ -137,6 +139,10 @@ function UserProfile() {
   );
 }
 export function AppSidebar() {
+  const isStandalone = !isEmbeddedMode({
+    mode: import.meta.env.VITE_APP_MODE as "auto" | "standalone" | "embedded",
+  });
+
   return (
     <Sidebar collapsible="icon" className="border-r" style={{ width: "16rem" }}>
       <SidebarHeader>
@@ -173,6 +179,20 @@ export function AppSidebar() {
       </SidebarContent>
 
       <UserProfile />
+
+      {/* Theme toggle in sidebar footer (standalone only) */}
+      {isStandalone && (
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <div className="flex items-center justify-center px-2 py-1.5">
+                <ThemeToggle />
+              </div>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      )}
+
       <SidebarRail />
     </Sidebar>
   );

@@ -5,7 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { UnifiedAuthProvider } from "@one-portal/auth";
 import { msalInstance, getAuthConfig } from "./auth/msalInstance";
 import { router } from "./router";
-import { Sonner } from "@one-portal/ui";
+import { ThemedSonner } from "./components/ThemedSonner";
 import "./app.css";
 import "./style.css";
 import "./styles/sidebar-overrides.css";
@@ -40,6 +40,6 @@ createRoot(document.getElementById("app")!).render(
         <RouterProvider router={router} />
       </QueryClientProvider>
     </UnifiedAuthProvider>
-    <Sonner />
+    <ThemedSonner />
   </StrictMode>,
 );
