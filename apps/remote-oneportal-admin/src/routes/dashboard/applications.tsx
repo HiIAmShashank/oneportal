@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DataTable, type RowAction, Button } from "@one-portal/ui";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Plus, Box } from "lucide-react";
 import { useState } from "react";
 import { createApplicationColumns } from "../../features/applications/columns/applicationColumns";
 import { useApplications } from "../../features/applications/hooks/useApplications";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/dashboard/applications")({
 
 function ApplicationsPage() {
   // Fetch applications with authentication
-  const { data } = useApplications();
+  const { data, isLoading, error } = useApplications();
   const toggleMutation = useToggleApplicationActive();
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
@@ -57,15 +57,22 @@ function ApplicationsPage() {
   const applications = data || [];
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-4 p-4">
       {/* Page Header */}
       <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold">Applications</h1>
-          <p className="text-muted-foreground">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">Applications</h1>
+          <p className="mt-2 text-base text-muted-foreground">
             Manage applications and their configurations
           </p>
         </div>
+        <div className="rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 p-3">
+          <Box className="h-8 w-8 text-blue-500" />
+        </div>
+      </div>
+
+      {/* Create Application Button */}
+      <div>
         <Button onClick={() => setIsCreateSheetOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Create Application
@@ -76,6 +83,8 @@ function ApplicationsPage() {
       <DataTable
         data={applications}
         columns={dataColumns}
+        isLoading={isLoading}
+        error={error}
         actions={{
           row: rowActions,
           pinRight: true,
@@ -98,6 +107,8 @@ function ApplicationsPage() {
           variant: "striped",
           showToolbar: true,
           emptyMessage: "No applications found in the system",
+          loadingMessage: "Loading applications...",
+          errorMessage: "Failed to load applications",
         }}
         persistence={{
           key: "oneportal-admin-applications-table",

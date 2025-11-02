@@ -85,3 +85,142 @@ body {
   background-color: var(--color-background);
   color: var(--color-foreground);
 }
+
+/* Shell App - Tailwind CSS Entry Point */
+@import "tailwindcss";
+
+/* ============================================
+   Dark Mode - Class-Based Strategy
+   ============================================
+   Uses Tailwind Vite plugin which supports @custom-variant
+   The dark variant targets elements when .dark class is present
+   on any ancestor (typically <html> or <body>)
+   ============================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   Source Scanning Configuration
+   ============================================
+   Scan this app's source code AND the UI package
+   Since UI components are imported into this app,
+   Tailwind will detect all classes including responsive utilities
+   ============================================ */
+
+/* Scan this app's source code */
+@source "../src/**/*.{ts,tsx}";
+
+/* Scan UI package components (imported by this app) */
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+
+/* Exclude test/config/type definition files */
+@source not "../src/**/*.test.{ts,tsx}";
+@source not "../src/**/*.spec.{ts,tsx}";
+@source not "../src/**/*.config.{ts,tsx}";
+@source not "../src/**/*.d.ts";
+
+/* Import theme variables from UI package */
+@import "@one-portal/ui/theme.css";
+
+/* Import font declarations */
+@import "@one-portal/ui/fonts.css";
+
+/* Import animations */
+@import "tw-animate-css";
+
+/* ============================================
+   Sidebar Theme Variables
+   ============================================ */
+:root {
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Base styles - Using direct properties for better HMR support */
+* {
+  border-color: var(--color-border);
+  outline-color: color-mix(in srgb, var(--color-ring) 50%, transparent);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* ============================================
+   Custom Scrollbar Styles - Primary Color
+   ============================================
+   Scrollbars with theme-aware primary colors
+   Works in both light and dark mode
+   ============================================ */
+
+/* Firefox - thin scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklch, var(--color-primary) 25%, transparent) transparent;
+}
+
+.dark * {
+  scrollbar-color: color-mix(in oklch, var(--color-primary) 35%, transparent) transparent;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--color-primary) 25%, transparent);
+  border-radius: 2px;
+  /* Squircle */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklch, var(--color-primary) 45%, transparent);
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--color-primary) 35%, transparent);
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklch, var(--color-primary) 55%, transparent);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}

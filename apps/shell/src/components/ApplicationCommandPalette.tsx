@@ -19,8 +19,8 @@ import { ApplicationGroupItem } from "./ApplicationGroupItem";
 import { useApplications } from "../hooks/useApplications";
 import { useToggleApplicationFavorite } from "../hooks/useToggleApplicationFavorite";
 import { useToggleFeatureFavorite } from "../hooks/useToggleFeatureFavorite";
-import { TooltipProvider, Spinner } from "@one-portal/ui";
-import { AlertCircle } from "lucide-react";
+import { TooltipProvider, Skeleton } from "@one-portal/ui";
+import { AlertCircle, Search } from "lucide-react";
 
 interface ApplicationCommandPaletteProps {
   search: string;
@@ -126,28 +126,61 @@ export function ApplicationCommandPalette({
           {/* Loading state */}
           {isLoading && (
             <Command.Loading>
-              <div className="flex items-center justify-center gap-2 py-8">
-                <Spinner size="sm" />
-                <span className="text-sm text-muted-foreground">
-                  Loading applications...
-                </span>
+              <div className="space-y-2 p-1">
+                {/* Section header skeleton */}
+                <div className="px-2 py-1.5">
+                  <Skeleton className="h-3 w-24" />
+                </div>
+
+                {/* Application item skeletons */}
+                {[0, 1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="flex gap-3 items-center px-2 py-2 rounded-sm animate-in fade-in-0 duration-300"
+                    style={{ animationDelay: `${i * 75}ms` }}
+                  >
+                    <Skeleton className="h-5 w-5 rounded shrink-0" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-48" />
+                    </div>
+                    <Skeleton className="h-4 w-4 rounded shrink-0" />
+                  </div>
+                ))}
               </div>
             </Command.Loading>
           )}
 
           {/* Empty state - shows when no results found or error occurred */}
           <Command.Empty>
-            <div className="flex flex-col items-center justify-center gap-2 py-8">
-              {error && (
-                <AlertCircle className="h-8 w-8 text-muted-foreground/50" />
+            <div className="flex flex-col items-center justify-center gap-3 py-12 animate-in fade-in-50 duration-300">
+              {error ? (
+                <>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
+                    <AlertCircle className="h-5 w-5 text-destructive" />
+                  </div>
+                  <div className="text-center space-y-1 max-w-60">
+                    <p className="text-sm font-medium">
+                      Unable to load applications
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Please check your connection and try again
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                    <Search className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="text-center space-y-1 max-w-60">
+                    <p className="text-sm font-medium">No applications found</p>
+                    <p className="text-xs text-muted-foreground">
+                      Try adjusting your search terms
+                    </p>
+                  </div>
+                </>
               )}
-              <p className="text-sm text-muted-foreground">
-                {error
-                  ? "Failed to load applications. Please try again."
-                  : !isLoading
-                    ? "No results found."
-                    : ""}
-              </p>
             </div>
           </Command.Empty>
 

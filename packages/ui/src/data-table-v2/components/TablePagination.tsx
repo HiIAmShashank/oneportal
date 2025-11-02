@@ -46,7 +46,7 @@ export function TablePagination<TData>({
   const endRow = Math.min((pageIndex + 1) * pageSize, totalRows);
 
   return (
-    <div className="flex items-center justify-between gap-4 border-t border-border dark:border-border bg-background dark:bg-background px-4 py-3">
+    <div className="flex items-center justify-between gap-4 bg-background dark:bg-background py-3">
       {/* Left: Page size selector */}
       {showPageSizeSelector && (
         <div className="flex items-center gap-2">

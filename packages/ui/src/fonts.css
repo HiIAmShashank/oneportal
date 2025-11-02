@@ -1,35 +1,23 @@
 /**
  * Font Face Declarations
  *
- * Proxima Nova font family with three weights:
- * - Light (300)
- * - Regular (400)
- * - Bold (700)
+ * Proxima Nova variable font with full weight range (100-900)
+ * and italic support.
  *
- * Font files are located in each app's public/fonts/ directory
+ * Font file is located in each app's public/fonts/ directory
  * and will be copied to dist/fonts/ during build.
+ *
+ * Variable fonts provide:
+ * - Full weight spectrum (thin to black)
+ * - Smaller file size than multiple static fonts
+ * - Smooth weight interpolation
+ * - Italic variants included
  */
 
 @font-face {
   font-family: 'Proxima Nova';
-  src: url('/fonts/proximanova_light.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Proxima Nova';
-  src: url('/fonts/proximanova_regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Proxima Nova';
-  src: url('/fonts/proximanova_bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
+  src: url('/fonts/Proxima-Vara-VF.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal italic;
   font-display: swap;
 }

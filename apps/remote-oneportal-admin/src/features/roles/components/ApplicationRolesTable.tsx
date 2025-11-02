@@ -18,8 +18,11 @@ interface ApplicationRolesTableProps {
 export function ApplicationRolesTable({
   userIdentifier,
 }: ApplicationRolesTableProps) {
-  const { data: roles = [], isLoading } =
-    useUserApplicationRoles(userIdentifier);
+  const {
+    data: roles = [],
+    isLoading,
+    error,
+  } = useUserApplicationRoles(userIdentifier);
   const { mutate: revokeRole } = useRevokeApplicationRole();
 
   const columns = useMemo(
@@ -41,38 +44,25 @@ export function ApplicationRolesTable({
     [revokeRole],
   );
 
-  if (!userIdentifier) {
-    return (
-      <div className="flex items-center justify-center py-12 text-muted-foreground">
-        Select a user to view their application roles
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-muted-foreground">Loading roles...</div>
-      </div>
-    );
-  }
-
-  if (roles.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-12 text-muted-foreground">
-        No application roles assigned
-      </div>
-    );
-  }
-
   return (
     <DataTable
-      data={roles}
+      data={!userIdentifier ? [] : roles}
       columns={columns}
+      isLoading={isLoading && !!userIdentifier}
+      error={error}
       features={{
         filtering: { enabled: true },
         sorting: { enabled: true },
         pagination: { enabled: true, pageSize: 10 },
+      }}
+      ui={{
+        variant: "striped",
+        showToolbar: true,
+        emptyMessage: !userIdentifier
+          ? "Select a user to view their application roles"
+          : "No application roles assigned",
+        loadingMessage: "Loading roles...",
+        errorMessage: "Failed to load application roles",
       }}
     />
   );

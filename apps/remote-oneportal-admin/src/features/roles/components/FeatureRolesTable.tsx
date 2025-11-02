@@ -16,7 +16,11 @@ interface FeatureRolesTableProps {
 }
 
 export function FeatureRolesTable({ userIdentifier }: FeatureRolesTableProps) {
-  const { data: roles = [], isLoading } = useUserFeatureRoles(userIdentifier);
+  const {
+    data: roles = [],
+    isLoading,
+    error,
+  } = useUserFeatureRoles(userIdentifier);
   const { mutate: revokeRole } = useRevokeFeatureRole();
 
   const columns = useMemo(
@@ -38,38 +42,25 @@ export function FeatureRolesTable({ userIdentifier }: FeatureRolesTableProps) {
     [revokeRole],
   );
 
-  if (!userIdentifier) {
-    return (
-      <div className="flex items-center justify-center py-12 text-muted-foreground">
-        Select a user to view their feature roles
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-muted-foreground">Loading roles...</div>
-      </div>
-    );
-  }
-
-  if (roles.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-12 text-muted-foreground">
-        No feature roles assigned
-      </div>
-    );
-  }
-
   return (
     <DataTable
-      data={roles}
+      data={!userIdentifier ? [] : roles}
       columns={columns}
+      isLoading={isLoading && !!userIdentifier}
+      error={error}
       features={{
         filtering: { enabled: true },
         sorting: { enabled: true },
         pagination: { enabled: true, pageSize: 10 },
+      }}
+      ui={{
+        variant: "striped",
+        showToolbar: true,
+        emptyMessage: !userIdentifier
+          ? "Select a user to view their feature roles"
+          : "No feature roles assigned",
+        loadingMessage: "Loading roles...",
+        errorMessage: "Failed to load feature roles",
       }}
     />
   );

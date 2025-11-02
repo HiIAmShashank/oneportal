@@ -84,7 +84,7 @@ export function createActionsColumn<TData>(
     meta: {
       __position: position, // Internal metadata for column positioning
     },
-    header: "Actions",
+    header: "",
     cell: ({ row }) => {
       // Filter actions based on hidden condition
       const visibleActions = actions.filter(

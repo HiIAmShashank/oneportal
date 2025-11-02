@@ -8,7 +8,7 @@ import type { MenuItem } from "../types/menu";
  */
 export const menuItems: MenuItem[] = [
   {
-    name: "Overview",
+    name: "Dashboard",
     path: "/",
     icon: "LayoutDashboard",
     order: 1,
@@ -17,7 +17,7 @@ export const menuItems: MenuItem[] = [
       {
         name: "Users",
         path: "/dashboard/users",
-        icon: "User",
+        icon: "UserCog",
         order: 1,
         description: "Manage users in the system",
       },

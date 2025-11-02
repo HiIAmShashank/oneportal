@@ -39,13 +39,22 @@ interface FacetedFilterProps<TData> {
   column: Column<TData>;
   title?: string;
   inline?: boolean; // Hide labels in inline mode
+  density?: "compact" | "default" | "comfortable";
 }
 
 export function FacetedFilter<TData>({
   column,
   title,
   inline = false,
+  density = "default",
 }: FacetedFilterProps<TData>) {
+  // Filter input height classes based on density
+  const filterHeightClasses = {
+    compact: "h-7",
+    default: "h-8",
+    comfortable: "h-9",
+  };
+  const filterHeight = filterHeightClasses[density];
   const metadata = useFaceting(column);
   const filterValue = column.getFilterValue();
   const placeholder =
@@ -88,7 +97,7 @@ export function FacetedFilter<TData>({
           value={(filterValue as string) ?? ""}
           onChange={(e) => column.setFilterValue(e.target.value || undefined)}
           placeholder={placeholder}
-          className="h-8"
+          className={cn(filterHeight, "placeholder:font-semibold")}
         />
       </div>
     );
@@ -112,8 +121,14 @@ export function FacetedFilter<TData>({
             column.setFilterValue(value === "__all__" ? undefined : value)
           }
         >
-          <SelectTrigger id={`filter-${column.id}`} className="h-8 w-full">
-            <SelectValue placeholder={`All ${title || column.id}`} />
+          <SelectTrigger
+            id={`filter-${column.id}`}
+            className={cn(filterHeight, "w-full")}
+          >
+            <SelectValue
+              placeholder={`All ${title || column.id}`}
+              className="font-semibold"
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">All {title || column.id}</SelectItem>
@@ -145,7 +160,7 @@ export function FacetedFilter<TData>({
             <Button
               variant="outline"
               size="sm"
-              className="h-8 w-full justify-between"
+              className={cn(filterHeight, "w-full justify-between")}
             >
               <span className="truncate">
                 {selected.length > 0
@@ -251,7 +266,7 @@ export function FacetedFilter<TData>({
             onChange={(e) => handleMinChange(e.target.value)}
             onBlur={(e) => handleMinChange(e.target.value)} // Filter on blur
             placeholder="Min"
-            className="h-8"
+            className={cn(filterHeight, "placeholder:font-semibold")}
           />
           <Input
             type="number"
@@ -259,7 +274,7 @@ export function FacetedFilter<TData>({
             onChange={(e) => handleMaxChange(e.target.value)}
             onBlur={(e) => handleMaxChange(e.target.value)} // Filter on blur
             placeholder="Max"
-            className="h-8"
+            className={cn(filterHeight, "placeholder:font-semibold")}
           />
         </div>
       </div>
@@ -292,8 +307,11 @@ export function FacetedFilter<TData>({
             column.setFilterValue(newValue);
           }}
         >
-          <SelectTrigger id={`filter-${column.id}`} className="h-8 w-full">
-            <SelectValue placeholder="All" />
+          <SelectTrigger
+            id={`filter-${column.id}`}
+            className={cn(filterHeight, "w-full")}
+          >
+            <SelectValue placeholder="All" className="font-semibold" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">All</SelectItem>
@@ -318,7 +336,7 @@ export function FacetedFilter<TData>({
             <Input
               value={startValue}
               placeholder="Start date"
-              className="h-8 pr-8"
+              className={cn(filterHeight, "pr-8 placeholder:font-semibold")}
               onChange={(e) => {
                 const val = e.target.value;
                 setStartValue(val);
@@ -356,7 +374,7 @@ export function FacetedFilter<TData>({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-8 w-8 p-0"
+                  className={cn("absolute right-0 top-0 w-8 p-0", filterHeight)}
                 >
                   <CalendarIcon className="h-4 w-4" />
                 </Button>
@@ -386,7 +404,7 @@ export function FacetedFilter<TData>({
             <Input
               value={endValue}
               placeholder="End date"
-              className="h-8 pr-8"
+              className={cn(filterHeight, "pr-8 placeholder:font-semibold")}
               onChange={(e) => {
                 const val = e.target.value;
                 setEndValue(val);
@@ -424,7 +442,7 @@ export function FacetedFilter<TData>({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-8 w-8 p-0"
+                  className={cn("absolute right-0 top-0 w-8 p-0", filterHeight)}
                 >
                   <CalendarIcon className="h-4 w-4" />
                 </Button>
@@ -471,8 +489,14 @@ export function FacetedFilter<TData>({
             column.setFilterValue(value === "__all__" ? undefined : value)
           }
         >
-          <SelectTrigger id={`filter-${column.id}`} className="h-8 w-full">
-            <SelectValue placeholder={`All ${title || column.id}`} />
+          <SelectTrigger
+            id={`filter-${column.id}`}
+            className={cn(filterHeight, "w-full")}
+          >
+            <SelectValue
+              placeholder={`All ${title || column.id}`}
+              className="font-semibold"
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">All {title || column.id}</SelectItem>
@@ -504,7 +528,7 @@ export function FacetedFilter<TData>({
         value={(filterValue as string) ?? ""}
         onChange={(e) => column.setFilterValue(e.target.value || undefined)}
         placeholder={placeholder}
-        className="h-8"
+        className={cn(filterHeight, "placeholder:font-semibold")}
       />
     </div>
   );

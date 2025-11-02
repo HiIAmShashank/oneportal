@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { DataTable, type RowAction, Button } from "@one-portal/ui";
+import { Layers, Plus } from "lucide-react";
 import { useFeatures } from "../../features/features/hooks/useFeatures";
 import { useToggleFeatureActive } from "../../features/features/hooks/useToggleFeatureActive";
 import { featureColumns } from "../../features/features/columns/featureColumns";
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/dashboard/features")({
  * - Shows all features (active and inactive) with parent application names
  */
 function FeaturesPage() {
-  const { data: features = [], error } = useFeatures();
+  const { data: features = [], isLoading, error } = useFeatures();
   const toggleMutation = useToggleFeatureActive();
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -56,34 +57,33 @@ function FeaturesPage() {
     },
   ];
 
-  if (error) {
-    return (
-      <div className="flex h-[calc(100vh-200px)] items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-lg font-semibold text-destructive">
-            Error Loading Features
-          </h2>
-          <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Features</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold tracking-tight">Features</h1>
+          <p className="mt-2 text-base text-muted-foreground">
             Manage application features and their settings
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>Create Feature</Button>
+        <div className="rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-500/5 p-3">
+          <Layers className="h-8 w-8 text-purple-500" />
+        </div>
+      </div>
+
+      {/* Create Feature Button */}
+      <div>
+        <Button onClick={() => setCreateOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Feature
+        </Button>
       </div>
 
       <DataTable
         data={features}
         columns={featureColumns}
+        isLoading={isLoading}
+        error={error}
         actions={{
           row: rowActions,
           pinRight: true,
@@ -106,6 +106,8 @@ function FeaturesPage() {
           variant: "striped",
           showToolbar: true,
           emptyMessage: "No features found in the system",
+          loadingMessage: "Loading features...",
+          errorMessage: "Failed to load features",
         }}
         persistence={{
           key: "oneportal-admin-features-table",

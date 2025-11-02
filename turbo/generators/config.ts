@@ -133,6 +133,8 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
           "   - Configuration files (package.json, vite.config.ts, tsconfig, eslint)",
         );
         // eslint-disable-next-line no-console
+        console.log("   - Proxima Nova variable font (public/fonts/)");
+        // eslint-disable-next-line no-console
         console.log("\nShell integration:");
         // eslint-disable-next-line no-console
         console.log("   - Auto-discovered by scripts/combine-builds.js");

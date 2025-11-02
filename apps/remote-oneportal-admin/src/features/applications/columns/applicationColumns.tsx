@@ -39,7 +39,7 @@ export function createApplicationColumns(_options?: {
       header: "Description",
       cell: ({ getValue }) => {
         const description = getValue() as string;
-        return <span className="max-w-md truncate text-sm">{description}</span>;
+        return <span className="max-w-md truncate">{description}</span>;
       },
       meta: {
         filterVariant: "text",
@@ -51,9 +51,7 @@ export function createApplicationColumns(_options?: {
     {
       accessorKey: "landingPage",
       header: "Landing Page",
-      cell: ({ getValue }) => (
-        <span className="font-mono text-xs">{getValue() as string}</span>
-      ),
+      cell: ({ getValue }) => <span>{getValue() as string}</span>,
       meta: {
         filterVariant: "text",
         filterPlaceholder: "Search landing page...",
@@ -64,9 +62,7 @@ export function createApplicationColumns(_options?: {
     {
       accessorKey: "module",
       header: "Module",
-      cell: ({ getValue }) => (
-        <span className="font-mono text-xs">{getValue() as string}</span>
-      ),
+      cell: ({ getValue }) => <span>{getValue() as string}</span>,
       meta: {
         filterVariant: "text",
         filterPlaceholder: "Search module...",
@@ -77,9 +73,7 @@ export function createApplicationColumns(_options?: {
     {
       accessorKey: "scope",
       header: "Scope",
-      cell: ({ getValue }) => (
-        <span className="font-mono text-xs">{getValue() as string}</span>
-      ),
+      cell: ({ getValue }) => <span>{getValue() as string}</span>,
       meta: {
         filterVariant: "text",
         filterPlaceholder: "Search scope...",
@@ -90,9 +84,7 @@ export function createApplicationColumns(_options?: {
     {
       accessorKey: "iconName",
       header: "Icon",
-      cell: ({ getValue }) => (
-        <span className="font-mono text-xs">{getValue() as string}</span>
-      ),
+      cell: ({ getValue }) => <span>{getValue() as string}</span>,
       meta: {
         filterVariant: "text",
         filterPlaceholder: "Search icon...",

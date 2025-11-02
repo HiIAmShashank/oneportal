@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DataTable, type RowAction, Button } from "@one-portal/ui";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Plus, UserCog } from "lucide-react";
 import { useState } from "react";
 import { createUserColumns } from "../../features/users/columns/userColumns";
 import { useUsers } from "../../features/users/hooks/useUsers";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/dashboard/users")({
 
 function UsersPage() {
   // Fetch users with authentication
-  const { data } = useUsers();
+  const { data, isLoading, error } = useUsers();
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<ApiUser | null>(null);
@@ -40,15 +40,22 @@ function UsersPage() {
   const users = data || [];
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-4 p-4">
       {/* Page Header */}
       <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold">Users</h1>
-          <p className="text-muted-foreground">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">Users</h1>
+          <p className="mt-2 text-base text-muted-foreground">
             Manage users and their access levels in the system
           </p>
         </div>
+        <div className="rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 p-3">
+          <UserCog className="h-8 w-8 text-primary" />
+        </div>
+      </div>
+
+      {/* Create User Button */}
+      <div>
         <Button onClick={() => setIsCreateSheetOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Create User
@@ -59,6 +66,8 @@ function UsersPage() {
       <DataTable
         data={users}
         columns={dataColumns}
+        isLoading={isLoading}
+        error={error}
         actions={{
           row: rowActions,
           pinRight: true,
@@ -81,6 +90,8 @@ function UsersPage() {
           variant: "striped",
           showToolbar: true,
           emptyMessage: "No users found in the system",
+          loadingMessage: "Loading users...",
+          errorMessage: "Failed to load users",
         }}
         persistence={{
           key: "oneportal-admin-users-table",

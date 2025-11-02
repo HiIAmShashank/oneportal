@@ -646,14 +646,13 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                           "text-left align-middle font-medium",
                           "text-muted-foreground dark:text-muted-foreground",
                           "[&:has([role=checkbox])]:pr-0",
+                          "relative after:absolute after:right-0 after:top-3 after:bottom-3 after:w-px after:bg-border",
+                          "last:after:hidden",
                           // Special handling for expand column to prevent cutoff
-                          header.column.id === "expand" && "!px-2",
+                          header.column.id === "expand" && "px-2!",
                           variantClasses[variant],
                           (stickyHeader || isPinned) &&
                             "bg-background dark:bg-background",
-                          // Directional shadows for pinned columns
-                          isPinned === "left" && "shadow-pinned-right",
-                          isPinned === "right" && "shadow-pinned-left",
                         )}
                       >
                         {header.isPlaceholder ? null : reorderingEnabled &&
@@ -791,11 +790,9 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                         }}
                         className={cn(
                           cellPaddingClasses[density],
+                          densityClasses[density],
                           (stickyHeader || isPinned) &&
                             "bg-muted/30 dark:bg-muted/20",
-                          // Directional shadows for pinned columns
-                          isPinned === "left" && "shadow-pinned-right",
-                          isPinned === "right" && "shadow-pinned-left",
                         )}
                       >
                         {/* Show filter only for non-special columns that allow filtering */}
@@ -812,6 +809,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                                   : header.column.id
                               }
                               inline={true}
+                              density={density}
                             />
                           </div>
                         ) : (
@@ -988,17 +986,12 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                             }}
                             className={cn(
                               cellPaddingClasses[density],
+                              densityClasses[density],
                               "align-middle",
                               "[&:has([role=checkbox])]:pr-0",
                               // Special handling for expand column to prevent cutoff
                               cell.column.id === "expand" && "!px-2",
                               variantClasses[variant],
-                              isPinned && "bg-background dark:bg-background",
-                              // Directional shadows for pinned columns
-                              isPinned === "left" &&
-                                "shadow-[4px_0_8px_-2px_rgba(0,0,0,0.1)] dark:shadow-[4px_0_8px_-2px_rgba(0,0,0,0.3)]",
-                              isPinned === "right" &&
-                                "shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.3)]",
                             )}
                           >
                             {/* Special columns (expand, select, actions) - always render normally */}
@@ -1117,11 +1110,6 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                           "text-muted-foreground dark:text-muted-foreground",
                           variantClasses[variant],
                           isPinned && "bg-muted/50 dark:bg-muted/20",
-                          // Directional shadows for pinned columns
-                          isPinned === "left" &&
-                            "shadow-[4px_0_8px_-2px_rgba(0,0,0,0.1)] dark:shadow-[4px_0_8px_-2px_rgba(0,0,0,0.3)]",
-                          isPinned === "right" &&
-                            "shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.3)]",
                         )}
                       >
                         {footer.isPlaceholder

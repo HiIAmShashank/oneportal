@@ -18,7 +18,7 @@ export const featureColumns: ColumnDef<ApiFeature>[] = [
     accessorKey: "featureName",
     header: "Feature Name",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("featureName")}</div>
+      <span className="font-medium">{row.getValue("featureName")}</span>
     ),
     enableSorting: true,
     enableColumnFilter: true,
@@ -31,11 +31,7 @@ export const featureColumns: ColumnDef<ApiFeature>[] = [
     header: "Description",
     cell: ({ row }) => {
       const description = row.getValue("featureDescription") as string;
-      return (
-        <div className="max-w-[300px] truncate text-muted-foreground">
-          {description || "—"}
-        </div>
-      );
+      return <span className="max-w-md truncate">{description}</span>;
     },
     enableSorting: true,
     enableColumnFilter: true,
@@ -48,11 +44,7 @@ export const featureColumns: ColumnDef<ApiFeature>[] = [
     header: "Feature URL",
     cell: ({ row }) => {
       const url = row.getValue("featureUrl") as string;
-      return (
-        <div className="font-mono text-sm text-muted-foreground">
-          {url || "—"}
-        </div>
-      );
+      return <span>{url}</span>;
     },
     enableSorting: true,
     enableColumnFilter: true,
@@ -65,7 +57,7 @@ export const featureColumns: ColumnDef<ApiFeature>[] = [
     header: "Icon",
     cell: ({ row }) => {
       const iconName = row.getValue("iconName") as string;
-      return <div className="font-mono text-sm">{iconName}</div>;
+      return <span>{iconName}</span>;
     },
     enableSorting: true,
     enableColumnFilter: true,
@@ -77,9 +69,7 @@ export const featureColumns: ColumnDef<ApiFeature>[] = [
     accessorKey: "applicationName",
     header: "Application",
     cell: ({ row }) => (
-      <div className="font-medium text-primary">
-        {row.getValue("applicationName")}
-      </div>
+      <span className="font-medium">{row.getValue("applicationName")}</span>
     ),
     enableSorting: true,
     enableColumnFilter: true,

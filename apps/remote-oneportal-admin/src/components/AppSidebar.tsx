@@ -1,19 +1,6 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import {
-  LayoutDashboard,
-  FolderTree,
-  Box,
-  Layers,
-  Palette,
-  Rocket,
-  Route,
-  Table,
-  ChevronRight,
-  LogOut,
-  User,
-  Shield,
-} from "lucide-react";
+import { ChevronRight, LogOut, User } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -36,37 +23,12 @@ import {
 import { AuthContext } from "@one-portal/auth";
 import { menuItems } from "../config/menu";
 import type { MenuItem } from "../types/menu";
-
-/**
- * Icon mapping from string names to lucide-react components
- */
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Rocket,
-  FolderTree,
-  Layers,
-  LayoutDashboard,
-  Box,
-  Table,
-  Route,
-  Palette,
-  Shield,
-};
-
-/**
- * Get icon component from icon name
- */
-function getIcon(
-  iconName?: string,
-): React.ComponentType<{ className?: string }> | null {
-  if (!iconName) return null;
-  return iconMap[iconName] || null;
-}
+import { DynamicIcon } from "./DynamicIcon";
 
 /**
  * Render a single menu item with optional children
  */
 function MenuItemComponent({ item }: { item: MenuItem }) {
-  const Icon = getIcon(item.icon);
   const hasChildren = item.children && item.children.length > 0;
 
   if (!hasChildren) {
@@ -81,7 +43,7 @@ function MenuItemComponent({ item }: { item: MenuItem }) {
             }}
             activeOptions={{ exact: true }}
           >
-            {Icon && <Icon className="h-4 w-4" />}
+            <DynamicIcon name={item.icon} className="h-4 w-4" />
             <span>{item.name}</span>
           </Link>
         </SidebarMenuButton>
@@ -96,12 +58,12 @@ function MenuItemComponent({ item }: { item: MenuItem }) {
         <div>
           <CollapsibleTrigger asChild>
             <SidebarMenuButton tooltip={item.description}>
-              {Icon && <Icon className="h-4 w-4" />}
+              <DynamicIcon name={item.icon} className="h-4 w-4" />
               <span>{item.name}</span>
               <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
             </SidebarMenuButton>
           </CollapsibleTrigger>
-          <CollapsibleContent>
+          <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2">
             <SidebarMenuSub>
               {item.children?.map((child) => (
                 <SidebarMenuSubItem key={child.path}>
@@ -114,10 +76,7 @@ function MenuItemComponent({ item }: { item: MenuItem }) {
                       }}
                       activeOptions={{ exact: true }}
                     >
-                      {getIcon(child.icon) &&
-                        React.createElement(getIcon(child.icon)!, {
-                          className: "h-4 w-4",
-                        })}
+                      <DynamicIcon name={child.icon} className="h-4 w-4" />
                       <span>{child.name}</span>
                     </Link>
                   </SidebarMenuSubButton>
@@ -185,7 +144,9 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link to="/">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground"></div>
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <DynamicIcon name="AppWindow" className="h-4 w-4" />
+                </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">One Portal Admin</span>
                   <span className="text-xs text-muted-foreground">

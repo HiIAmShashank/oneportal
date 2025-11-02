@@ -30,7 +30,7 @@ export function AppBreadcrumb() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbPage className="flex items-center gap-1">
-              Overview
+              Dashboard
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
@@ -38,11 +38,19 @@ export function AppBreadcrumb() {
     );
   }
 
+  // Filter out "dashboard" segment to avoid duplication with root Dashboard link
+  const filteredSegments = segments.filter(
+    (segment) => segment.toLowerCase() !== "dashboard",
+  );
+
   // Build breadcrumb path
   let currentPath = "";
-  const breadcrumbs = segments.map((segment, index) => {
+  const breadcrumbs = filteredSegments.map((segment, index) => {
     currentPath += `/${segment}`;
-    const isLast = index === segments.length - 1;
+    // For nested dashboard routes, prepend /dashboard to the path
+    const fullPath =
+      segments[0] === "dashboard" ? `/dashboard${currentPath}` : currentPath;
+    const isLast = index === filteredSegments.length - 1;
 
     // Format segment name (capitalize and replace hyphens with spaces)
     const displayName = segment
@@ -51,7 +59,7 @@ export function AppBreadcrumb() {
       .join(" ");
 
     return {
-      path: currentPath,
+      path: fullPath,
       name: displayName,
       isLast,
     };
@@ -63,7 +71,7 @@ export function AppBreadcrumb() {
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <Link to="/" className="flex items-center gap-1">
-              Overview
+              Dashboard
             </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
