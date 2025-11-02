@@ -62,7 +62,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate TanStack Router route trees
-        run: pnpm --parallel --filter "./apps/*" --filter "!./apps/storybook" exec tsr generate
+        run: pnpm --parallel --filter "./apps/*" --filter "!./apps/storybook" exec pnpm tsr generate
 
       - name: Create environment files dynamically
         run: node scripts/write-env-files.js
