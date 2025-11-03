@@ -254,6 +254,16 @@ export interface FeaturesConfig<TData = unknown> {
     loading?: boolean;
     error?: Error | null;
     onFetch?: (params: ServerSideParams) => Promise<void> | void;
+
+    // Hybrid mode: Enable client-side filtering on server-fetched data
+    // When true: column filters work client-side on current page data
+    // When false (default): all filtering is server-side
+    clientSideFiltering?: boolean;
+
+    // Hybrid mode: Enable client-side sorting on server-fetched data
+    // When true: sorting works client-side on current page data
+    // When false (default): sorting is server-side
+    clientSideSorting?: boolean;
   };
 }
 

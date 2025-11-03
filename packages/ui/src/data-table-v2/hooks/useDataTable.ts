@@ -152,8 +152,19 @@ export function useDataTable<TData>(
   // Server-side config
   const serverSideConfig = useMemo(() => {
     if (!features.serverSide)
-      return { enabled: false, totalCount: 0, loading: false, error: null };
-    return features.serverSide;
+      return {
+        enabled: false,
+        totalCount: 0,
+        loading: false,
+        error: null,
+        clientSideFiltering: false,
+        clientSideSorting: false,
+      };
+    return {
+      ...features.serverSide,
+      clientSideFiltering: features.serverSide.clientSideFiltering ?? false,
+      clientSideSorting: features.serverSide.clientSideSorting ?? false,
+    };
   }, [features.serverSide]);
 
   // ============================================================================
@@ -190,15 +201,16 @@ export function useDataTable<TData>(
       // Sorting
       enableSorting: sortingConfig.enabled,
       ...(sortingConfig.enabled &&
-        !serverSideConfig.enabled && {
+        (!serverSideConfig.enabled || serverSideConfig.clientSideSorting) && {
           getSortedRowModel: getSortedRowModel(),
           enableMultiSort: sortingConfig.multi,
         }),
-      manualSorting: serverSideConfig.enabled,
+      manualSorting:
+        serverSideConfig.enabled && !serverSideConfig.clientSideSorting,
 
       // Filtering
       ...(filteringConfig.enabled &&
-        !serverSideConfig.enabled && {
+        (!serverSideConfig.enabled || serverSideConfig.clientSideFiltering) && {
           getFilteredRowModel: getFilteredRowModel(),
           // V2: Enable faceting for smart filter detection
           getFacetedRowModel: getFacetedRowModel(),
@@ -208,7 +220,8 @@ export function useDataTable<TData>(
           enableGlobalFilter: filteringConfig.global,
           enableColumnFilters: filteringConfig.columns,
         }),
-      manualFiltering: serverSideConfig.enabled,
+      manualFiltering:
+        serverSideConfig.enabled && !serverSideConfig.clientSideFiltering,
 
       // Pagination
       ...(paginationConfig.enabled &&
