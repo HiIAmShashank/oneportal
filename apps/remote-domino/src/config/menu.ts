@@ -21,4 +21,18 @@ export const menuItems: MenuItem[] = [
     order: 2,
     description: "View Domino Event System events",
   },
+  {
+    name: "Event Types",
+    path: "/event-types",
+    icon: "Tag",
+    order: 3,
+    description: "View and manage event type definitions",
+  },
+  {
+    name: "Applications",
+    path: "/applications",
+    icon: "AppWindow",
+    order: 4,
+    description: "View and manage registered applications",
+  },
 ];

@@ -4,7 +4,7 @@
 
 import type { ColumnDef } from "@one-portal/ui";
 import { formatDistanceToNow } from "date-fns";
-import { Eye } from "lucide-react";
+import { ListCollapse } from "lucide-react";
 import { Button } from "@one-portal/ui";
 import type { Event } from "../../../api";
 
@@ -27,87 +27,6 @@ export function createEventColumns(
 ): ColumnDef<Event>[] {
   return [
     {
-      accessorKey: "eventID",
-      header: "Event ID",
-      cell: ({ row }) => (
-        <span className="max-w-[120px] truncate font-mono text-xs">
-          {row.original.eventID}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "application",
-      header: "Application",
-      cell: ({ row }) => (
-        <span className="max-w-[150px] truncate font-medium">
-          {row.original.application}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "eventType",
-      header: "Event Type",
-      cell: ({ row }) => (
-        <span className="max-w-[180px] truncate font-mono text-xs">
-          {row.original.eventType}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "eventData",
-      header: "Event Data",
-      cell: ({ row }) => (
-        <span className="max-w-xs truncate text-xs text-muted-foreground">
-          {row.original.eventData}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "resourceID",
-      header: "Resource ID",
-      cell: ({ row }) => (
-        <span className="max-w-[120px] truncate font-mono text-xs">
-          {row.original.resourceID || "—"}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "correlationID",
-      header: "Correlation ID",
-      cell: ({ row }) => (
-        <span className="max-w-[120px] truncate font-mono text-xs">
-          {row.original.correlationID}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "utcCreatedDate",
-      header: "Created",
-      cell: ({ row }) => (
-        <span className="text-xs">
-          {formatRelativeDate(row.original.utcCreatedDate)}
-        </span>
-      ),
-    },
-    {
-      id: "jobs",
-      header: "Jobs",
-      cell: ({ row }) => (
-        <span className="text-xs">
-          {row.original.jobCompletedCount}/{row.original.jobCount}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "utcLastActivityDate",
-      header: "Last Activity",
-      cell: ({ row }) => (
-        <span className="text-xs">
-          {formatRelativeDate(row.original.utcLastActivityDate)}
-        </span>
-      ),
-    },
-    {
       id: "actions",
       header: "",
       cell: ({ row }) => (
@@ -117,10 +36,149 @@ export function createEventColumns(
           onClick={() => onViewDetails(row.original)}
           className="h-8 w-8 p-0"
         >
-          <Eye className="h-4 w-4" />
+          <ListCollapse className="h-4 w-4" />
           <span className="sr-only">View details</span>
         </Button>
       ),
+      size: 40,
+      maxSize: 40,
+      enableSorting: false,
+      enableColumnFilter: false,
+    },
+    {
+      id: "eventID",
+      accessorKey: "eventID",
+      header: "Event ID",
+      cell: ({ getValue }) => <span>{getValue() as string}</span>,
+      enableSorting: true,
+      enableColumnFilter: true,
+      meta: {
+        filterVariant: "text",
+        filterPlaceholder: "Search by ID...",
+      },
+    },
+    {
+      id: "application",
+      accessorKey: "application",
+      header: "Application",
+      cell: ({ getValue }) => (
+        <span className="font-medium">{getValue() as string}</span>
+      ),
+      enableSorting: true,
+      enableColumnFilter: true,
+      meta: {
+        filterVariant: "text",
+        filterPlaceholder: "Search application...",
+      },
+    },
+    {
+      id: "eventType",
+      accessorKey: "eventType",
+      header: "Event Type",
+      cell: ({ getValue }) => <span>{getValue() as string}</span>,
+      enableSorting: true,
+      enableColumnFilter: true,
+      meta: {
+        filterVariant: "text",
+        filterPlaceholder: "Search event type...",
+      },
+    },
+    {
+      id: "eventData",
+      accessorKey: "eventData",
+      header: "Event Data",
+      cell: ({ getValue }) => {
+        const data = getValue() as string;
+        return <span className="max-w-xs truncate">{data}</span>;
+      },
+      enableSorting: true,
+      enableColumnFilter: true,
+      meta: {
+        filterVariant: "text",
+        filterPlaceholder: "Search event data...",
+      },
+    },
+    {
+      id: "resourceID",
+      accessorKey: "resourceID",
+      header: "Resource ID",
+      cell: ({ getValue }) => {
+        const resourceID = getValue() as string | null;
+        return resourceID ? (
+          <span>{resourceID}</span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        );
+      },
+      enableSorting: true,
+      enableColumnFilter: true,
+      meta: {
+        filterVariant: "text",
+        filterPlaceholder: "Search resource ID...",
+      },
+    },
+    {
+      id: "correlationID",
+      accessorKey: "correlationID",
+      header: "Correlation ID",
+      cell: ({ getValue }) => <span>{getValue() as string}</span>,
+      enableSorting: true,
+      enableColumnFilter: true,
+      meta: {
+        filterVariant: "text",
+        filterPlaceholder: "Search correlation ID...",
+      },
+    },
+    {
+      id: "utcCreatedDate",
+      accessorKey: "utcCreatedDate",
+      header: "Created",
+      cell: ({ getValue }) => {
+        const date = getValue() as string;
+        return (
+          <span className="text-sm text-muted-foreground">
+            {formatRelativeDate(date)}
+          </span>
+        );
+      },
+      enableSorting: true,
+      enableColumnFilter: true,
+      meta: {
+        filterVariant: "date-range",
+      },
+    },
+    {
+      id: "utcLastActivityDate",
+      accessorKey: "utcLastActivityDate",
+      header: "Last Activity",
+      cell: ({ getValue }) => {
+        const date = getValue() as string;
+        return (
+          <span className="text-sm text-muted-foreground">
+            {formatRelativeDate(date)}
+          </span>
+        );
+      },
+      enableSorting: true,
+      enableColumnFilter: true,
+      meta: {
+        filterVariant: "date-range",
+      },
+    },
+
+    {
+      id: "jobs",
+      accessorKey: "jobCount",
+      header: "Jobs",
+      cell: ({ row }) => (
+        <span>
+          {row.original.jobCompletedCount}/{row.original.jobCount}
+        </span>
+      ),
+      size: 60,
+      maxSize: 60,
+      enableSorting: false,
+      enableColumnFilter: false,
     },
   ];
 }

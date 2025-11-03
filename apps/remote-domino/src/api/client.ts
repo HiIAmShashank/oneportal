@@ -169,7 +169,7 @@ export async function fetchEventTypes(
   // Fetch all event types without pagination limits for filtering
   const queryString = buildQueryString({
     pageNumber: 1,
-    pageSize: 1000, // Large page size to get all event types
+    pageSize: 500, // Large page size to get all event types
   });
 
   return await apiRequest<PaginatedEventTypesResponse>(
@@ -191,7 +191,7 @@ export async function fetchApplications(
   // Fetch all applications without pagination limits for filtering
   const queryString = buildQueryString({
     pageNumber: 1,
-    pageSize: 1000, // Large page size to get all applications
+    pageSize: 500, // Large page size to get all applications
   });
 
   return await apiRequest<PaginatedApplicationsResponse>(

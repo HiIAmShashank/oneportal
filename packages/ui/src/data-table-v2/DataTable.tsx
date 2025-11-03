@@ -452,10 +452,13 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
       const tableState = table.getState();
 
       // Build filters object from column filters
+      // Skip if clientSideFiltering is enabled (filters are client-side only)
       const filters: Record<string, unknown> = {};
-      for (const filter of tableState.columnFilters) {
-        if (filter.value !== undefined && filter.value !== null) {
-          filters[filter.id] = filter.value;
+      if (!features.serverSide.clientSideFiltering) {
+        for (const filter of tableState.columnFilters) {
+          if (filter.value !== undefined && filter.value !== null) {
+            filters[filter.id] = filter.value;
+          }
         }
       }
 
@@ -463,12 +466,20 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
       const params = {
         page: tableState.pagination.pageIndex,
         pageSize: tableState.pagination.pageSize,
-        sortBy: tableState.sorting[0]?.id,
-        sortOrder: tableState.sorting[0]?.desc
-          ? ("desc" as const)
-          : ("asc" as const),
+        // Skip sorting if clientSideSorting is enabled (sorting is client-side only)
+        sortBy: features.serverSide.clientSideSorting
+          ? undefined
+          : tableState.sorting[0]?.id,
+        sortOrder: features.serverSide.clientSideSorting
+          ? undefined
+          : tableState.sorting[0]?.desc
+            ? ("desc" as const)
+            : ("asc" as const),
         filters,
-        globalFilter: tableState.globalFilter as string | undefined,
+        // Use client-side global filter when clientSideFiltering is enabled
+        globalFilter: features.serverSide.clientSideFiltering
+          ? undefined
+          : (tableState.globalFilter as string | undefined),
       };
 
       // Trigger fetch callback
@@ -483,9 +494,17 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
     handleServerFetch,
     table.getState().pagination.pageIndex,
     table.getState().pagination.pageSize,
-    table.getState().sorting,
-    table.getState().columnFilters,
-    table.getState().globalFilter,
+    // Only re-fetch on sorting changes if NOT using clientSideSorting
+    ...(features?.serverSide?.clientSideSorting
+      ? []
+      : [table.getState().sorting]),
+    // Only re-fetch on filter changes if NOT using clientSideFiltering
+    ...(features?.serverSide?.clientSideFiltering
+      ? []
+      : [table.getState().columnFilters]),
+    ...(features?.serverSide?.clientSideFiltering
+      ? []
+      : [table.getState().globalFilter]),
   ]);
 
   // Extract UI config with defaults

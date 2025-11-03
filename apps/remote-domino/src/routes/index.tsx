@@ -1,157 +1,301 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Card,
-  CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
+  Skeleton,
 } from "@one-portal/ui";
+import { useEvents } from "../hooks/useEvents";
+import { useEventTypes } from "../hooks/useEventTypes";
+import { useApplications } from "../hooks/useApplications";
+import { DynamicIcon } from "../components/DynamicIcon";
+import { ArrowRight, TrendingUp } from "lucide-react";
 
 export const Route = createFileRoute("/")({
-  component: IndexPage,
+  component: DashboardPage,
 });
 
-function IndexPage() {
+function DashboardPage() {
+  // Fetch live data
+  const {
+    data: eventsData,
+    isLoading: eventsLoading,
+    error: eventsError,
+  } = useEvents({ pageNumber: 1, pageSize: 1000 });
+
+  const {
+    data: eventTypesData,
+    isLoading: eventTypesLoading,
+    error: eventTypesError,
+  } = useEventTypes();
+
+  const {
+    data: applicationsData,
+    isLoading: applicationsLoading,
+    error: applicationsError,
+  } = useApplications();
+
+  // Calculate event statistics
+  const eventStats = {
+    total: eventsData?.totalCount ?? 0,
+    secure: eventsData?.data.filter((e) => e.isSecure).length ?? 0,
+    nonSecure: eventsData?.data.filter((e) => !e.isSecure).length ?? 0,
+  };
+
+  const eventTypeStats = {
+    total: eventTypesData?.totalCount ?? 0,
+  };
+
+  const applicationStats = {
+    total: applicationsData?.totalCount ?? 0,
+    withSecure:
+      applicationsData?.data.filter((a) => a.hasSecureAccess).length ?? 0,
+    withoutSecure:
+      applicationsData?.data.filter((a) => !a.hasSecureAccess).length ?? 0,
+  };
+
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Welcome to OnePortal</h1>
-        <p className="text-muted-foreground text-lg">
-          A centralized platform for accessing applications at Mott MacDonald
-        </p>
+    <div className="flex flex-col gap-8 p-6">
+      {/* Header Section */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground mt-2">
+              Monitor the Event System
+            </p>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>What is OnePortal?</CardTitle>
-          <CardDescription>
-            Understanding the micro-frontend architecture
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm">
-            OnePortal is a <strong>micro-frontend platform</strong> that allows
-            multiple teams to build and deploy independent applications that
-            work together seamlessly. Think of it as a central hub where users
-            can access all their tools in one place.
-          </p>
+      {/* Stats Grid */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* Events Card */}
+        <Link to="/events" className="group">
+          <Card className="border border-white/20 dark:border-white/10 shadow-xl bg-background/40 backdrop-blur-lg hover:bg-background/50 transition-all relative overflow-hidden h-full">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-primary/10 to-transparent rounded-full -mr-16 -mt-16" />
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                    <DynamicIcon name="Activity" className="h-6 w-6" />
+                  </div>
+                  <CardDescription className="text-lg font-medium text-muted-foreground">
+                    Events
+                  </CardDescription>
+                </div>
+                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+              </div>
+              {eventsLoading ? (
+                <Skeleton className="h-12 w-32 mt-4" />
+              ) : eventsError ? (
+                <CardTitle className="text-2xl font-bold text-destructive mt-4">
+                  Error
+                </CardTitle>
+              ) : (
+                <CardTitle className="text-4xl font-bold mt-4 bg-linear-to-br from-foreground to-foreground/70 bg-clip-text">
+                  {eventStats.total.toLocaleString()}
+                </CardTitle>
+              )}
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-3 pt-0">
+              {eventsLoading ? (
+                <>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </>
+              ) : eventsError ? (
+                <p className="text-xs text-destructive">
+                  Failed to load events data
+                </p>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-green-500" />
+                      <span className="text-lg text-muted-foreground">
+                        Secure
+                      </span>
+                    </div>
+                    <span className="text-lg font-semibold text-green-600 dark:text-green-400">
+                      {eventStats.secure}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-amber-500" />
+                      <span className="text-lg text-muted-foreground">
+                        Non-Secure
+                      </span>
+                    </div>
+                    <span className="text-lg font-semibold text-amber-600 dark:text-amber-400">
+                      {eventStats.nonSecure}
+                    </span>
+                  </div>
+                  {eventStats.total > 0 && (
+                    <div className="w-full mt-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <TrendingUp className="h-3 w-3 text-green-500" />
+                        <span className="text-xs text-muted-foreground">
+                          {(
+                            (eventStats.secure / eventStats.total) *
+                            100
+                          ).toFixed(1)}
+                          % secure
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-1.5">
+                        <div
+                          className="bg-linear-to-r from-green-500 to-green-600 h-1.5 rounded-full transition-all"
+                          style={{
+                            width: `${(eventStats.secure / eventStats.total) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardFooter>
+          </Card>
+        </Link>
 
-          <div className="rounded-lg bg-muted p-4">
-            <h3 className="font-semibold mb-2 text-sm">How it Works</h3>
-            <ul className="text-sm text-muted-foreground space-y-2">
-              <li className="flex items-start gap-2">
-                <span className="text-primary">1.</span>
-                <span>
-                  The <strong>Shell</strong> application loads first (the main
-                  container)
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary">2.</span>
-                <span>
-                  <strong>Remote apps</strong> (like this one) are loaded
-                  dynamically when needed
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary">3.</span>
-                <span>
-                  Users authenticate once and access all apps with{" "}
-                  <strong>Single Sign-On</strong>
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary">4.</span>
-                <span>
-                  Each remote app can be developed and deployed{" "}
-                  <strong>independently</strong>
-                </span>
-              </li>
-            </ul>
-          </div>
+        {/* Event Types Card */}
+        <Link to="/event-types" className="group">
+          <Card className="border border-white/20 dark:border-white/10 shadow-xl bg-background/40 backdrop-blur-lg hover:bg-background/50 transition-all relative overflow-hidden h-full">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-amber-500/10 to-transparent rounded-full -mr-16 -mt-16" />
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <DynamicIcon name="Tag" className="h-6 w-6" />
+                  </div>
+                  <CardDescription className="text-lg font-medium text-muted-foreground">
+                    Event Types
+                  </CardDescription>
+                </div>
+                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+              </div>
+              {eventTypesLoading ? (
+                <Skeleton className="h-12 w-32 mt-4" />
+              ) : eventTypesError ? (
+                <CardTitle className="text-2xl font-bold text-destructive mt-4">
+                  Error
+                </CardTitle>
+              ) : (
+                <CardTitle className="text-4xl font-bold mt-4 bg-linear-to-br from-foreground to-foreground/70 bg-clip-text">
+                  {eventTypeStats.total.toLocaleString()}
+                </CardTitle>
+              )}
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-3 pt-0">
+              {eventTypesLoading ? (
+                <Skeleton className="h-4 w-full" />
+              ) : eventTypesError ? (
+                <p className="text-xs text-destructive">
+                  Failed to load event types data
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Registered event type definitions in the system
+                </p>
+              )}
+            </CardFooter>
+          </Card>
+        </Link>
 
-          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-            <h3 className="font-semibold mb-2 text-sm">Why Use OnePortal?</h3>
-            <ul className="text-sm space-y-1">
-              <li>
-                <strong>Single access point</strong> - No need to remember
-                multiple URLs
-              </li>
-              <li>
-                <strong>Shared authentication</strong> - Sign in once, access
-                everything
-              </li>
-              <li>
-                <strong>Consistent UI</strong> - Same look and feel across all
-                apps
-              </li>
-              <li>
-                <strong>Independent deployment</strong> - Update your app
-                without affecting others
-              </li>
-              <li>
-                <strong>Shared components</strong> - Reuse UI components across
-                apps
-              </li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Overview</CardTitle>
-          <CardDescription>
-            Key technologies used in this platform
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded-lg border p-3">
-              <h4 className="font-semibold text-sm mb-1">React 19</h4>
-              <p className="text-xs text-muted-foreground">
-                Modern UI framework
-              </p>
-            </div>
-            <div className="rounded-lg border p-3">
-              <h4 className="font-semibold text-sm mb-1">Module Federation</h4>
-              <p className="text-xs text-muted-foreground">
-                Load apps dynamically
-              </p>
-            </div>
-            <div className="rounded-lg border p-3">
-              <h4 className="font-semibold text-sm mb-1">TanStack Router</h4>
-              <p className="text-xs text-muted-foreground">
-                File-based routing
-              </p>
-            </div>
-            <div className="rounded-lg border p-3">
-              <h4 className="font-semibold text-sm mb-1">Tailwind CSS v4</h4>
-              <p className="text-xs text-muted-foreground">
-                Utility-first styling
-              </p>
-            </div>
-            <div className="rounded-lg border p-3">
-              <h4 className="font-semibold text-sm mb-1">Azure AD (MSAL)</h4>
-              <p className="text-xs text-muted-foreground">
-                Authentication & SSO
-              </p>
-            </div>
-            <div className="rounded-lg border p-3">
-              <h4 className="font-semibold text-sm mb-1">Turborepo</h4>
-              <p className="text-xs text-muted-foreground">
-                Monorepo management
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="rounded-lg bg-muted p-4">
-        <p className="text-sm text-muted-foreground">
-          Use the sidebar navigation to explore different topics and learn how
-          to build your own micro-frontend application in OnePortal.
-        </p>
+        {/* Applications Card */}
+        <Link to="/applications" className="group">
+          <Card className="border border-white/20 dark:border-white/10 shadow-xl bg-background/40 backdrop-blur-lg hover:bg-background/50 transition-all relative overflow-hidden h-full">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-blue-500/10 to-transparent rounded-full -mr-16 -mt-16" />
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                    <DynamicIcon name="AppWindow" className="h-6 w-6" />
+                  </div>
+                  <CardDescription className="text-lg font-medium text-muted-foreground">
+                    Applications
+                  </CardDescription>
+                </div>
+                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+              </div>
+              {applicationsLoading ? (
+                <Skeleton className="h-12 w-32 mt-4" />
+              ) : applicationsError ? (
+                <CardTitle className="text-2xl font-bold text-destructive mt-4">
+                  Error
+                </CardTitle>
+              ) : (
+                <CardTitle className="text-4xl font-bold mt-4 bg-linear-to-br from-foreground to-foreground/70 bg-clip-text">
+                  {applicationStats.total.toLocaleString()}
+                </CardTitle>
+              )}
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-3 pt-0">
+              {applicationsLoading ? (
+                <>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </>
+              ) : applicationsError ? (
+                <p className="text-xs text-destructive">
+                  Failed to load applications data
+                </p>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-green-500" />
+                      <span className="text-lg text-muted-foreground">
+                        Secure Access
+                      </span>
+                    </div>
+                    <span className="text-lg font-semibold text-green-600 dark:text-green-400">
+                      {applicationStats.withSecure}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-amber-500" />
+                      <span className="text-lg text-muted-foreground">
+                        Standard
+                      </span>
+                    </div>
+                    <span className="text-lg font-semibold text-amber-600 dark:text-amber-400">
+                      {applicationStats.withoutSecure}
+                    </span>
+                  </div>
+                  {applicationStats.total > 0 && (
+                    <div className="w-full mt-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <TrendingUp className="h-3 w-3 text-green-500" />
+                        <span className="text-xs text-muted-foreground">
+                          {(
+                            (applicationStats.withSecure /
+                              applicationStats.total) *
+                            100
+                          ).toFixed(1)}
+                          % with secure access
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-1.5">
+                        <div
+                          className="bg-linear-to-r from-blue-500 to-blue-600 h-1.5 rounded-full transition-all"
+                          style={{
+                            width: `${(applicationStats.withSecure / applicationStats.total) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardFooter>
+          </Card>
+        </Link>
       </div>
     </div>
   );

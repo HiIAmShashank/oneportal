@@ -11,6 +11,7 @@ import { Input } from "@one-portal/ui";
 import { Label } from "@one-portal/ui";
 import { Button } from "@one-portal/ui";
 import { ComboboxField } from "../components/ComboboxField";
+import { RotateCw, FilterX, Activity } from "lucide-react";
 
 export const Route = createFileRoute("/events")({
   component: EventsPage,
@@ -84,12 +85,18 @@ function EventsPage() {
     setPageSize(params.pageSize);
   };
   return (
-    <div className="p-6 space-y-4">
-      <div>
-        <h1 className="text-3xl font-bold">Events</h1>
-        <p className="text-muted-foreground">
-          View and manage Domino Event System events
-        </p>
+    <div className="flex flex-col gap-4 p-4">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">Events</h1>
+          <p className="mt-2 text-base text-muted-foreground">
+            View and manage Domino Event System events
+          </p>
+        </div>
+        <div className="rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 p-3">
+          <Activity className="h-8 w-8 text-primary" />
+        </div>
       </div>
 
       {/* Filter Controls */}
@@ -138,19 +145,11 @@ function EventsPage() {
         </div>
 
         <div className="flex items-end gap-2">
-          <Button
-            variant="outline"
-            onClick={handleResetFilters}
-            className="flex-1"
-          >
-            Reset
+          <Button variant="outline" onClick={handleResetFilters} size="icon">
+            <FilterX className="h-4 w-4" />
           </Button>
-          <Button
-            variant="default"
-            onClick={() => refetch()}
-            className="flex-1"
-          >
-            Refresh
+          <Button variant="outline" onClick={() => refetch()} size="icon">
+            <RotateCw className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -168,6 +167,8 @@ function EventsPage() {
             loading: isLoading,
             error: error,
             onFetch: handleServerSideFetch,
+            clientSideFiltering: true, // Enable client-side column filters
+            clientSideSorting: true, // Enable client-side sorting
           },
           pagination: {
             enabled: true,
@@ -184,6 +185,18 @@ function EventsPage() {
             enabled: true,
             multi: false,
           },
+        }}
+        ui={{
+          variant: "striped",
+          filterMode: "inline",
+          showToolbar: true,
+          emptyMessage: "No events found",
+          loadingMessage: "Loading events...",
+          errorMessage: "Failed to load events",
+        }}
+        persistence={{
+          key: "domino-events-table",
+          enabled: true,
         }}
       />
       <EventDetailsSheet
