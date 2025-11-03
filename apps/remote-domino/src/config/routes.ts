@@ -6,6 +6,10 @@
  * - /auth/callback: OAuth callback handler
  */
 
-export const PUBLIC_ROUTES = ["/sign-in", "/auth/callback"] as const;
+export const PUBLIC_ROUTES = [
+  "/sign-in",
+  "/auth/callback",
+  "/unauthorized",
+] as const;
 
 export type PublicRoute = (typeof PUBLIC_ROUTES)[number];

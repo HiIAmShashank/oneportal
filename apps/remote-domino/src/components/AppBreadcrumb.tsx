@@ -1,103 +1,97 @@
-import * as React from 'react';
-import { Link, useLocation } from '@tanstack/react-router';
+import { useLocation, Link } from "@tanstack/react-router";
+import { ChevronRight } from "lucide-react";
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@one-portal/ui';
-import { ChevronRight } from 'lucide-react';
-import { useIsMobile } from '@one-portal/ui';
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@one-portal/ui";
+import React from "react";
 
 /**
- * Convert path segment to readable label
- * Example: 'dashboard' -> 'Dashboard', 'event-details' -> 'Event Details'
- */
-function formatBreadcrumbLabel(segment: string): string {
-    return segment
-        .split('-')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-}
-
-/**
- * Auto-generated breadcrumb navigation from current route
- * 
- * Features:
- * - Mobile: Shows last 2 levels only
- * - Desktop: Shows full breadcrumb path
- * - Home link defaults to '/dashboard'
+ * Breadcrumb navigation component
+ *
+ * Automatically generates breadcrumbs based on the current route path.
+ * Handles both root paths and nested routes.
  */
 export function AppBreadcrumb() {
-    const location = useLocation();
-    const isMobile = useIsMobile();
+  const location = useLocation();
+  const pathname = location.pathname;
 
-    // Parse pathname into breadcrumb segments
-    const pathSegments = location.pathname
-        .split('/')
-        .filter(Boolean);
+  // Parse path segments
+  const segments = pathname.split("/").filter(Boolean);
 
-    // Build breadcrumb items with paths
-    const breadcrumbItems = pathSegments.map((segment, index) => {
-        const path = '/' + pathSegments.slice(0, index + 1).join('/');
-        const label = formatBreadcrumbLabel(segment);
-        return { path, label };
-    });
-
-    // On mobile, show only last 2 items
-    const visibleItems = isMobile && breadcrumbItems.length > 2
-        ? breadcrumbItems.slice(-2)
-        : breadcrumbItems;
-
-    // If no breadcrumbs (root path), show nothing
-    if (breadcrumbItems.length === 0) {
-        return null;
-    }
-
+  // Handle root path
+  if (segments.length === 0 || pathname === "/") {
     return (
-        <Breadcrumb>
-            <BreadcrumbList>
-                {/* Always show Home link on desktop */}
-                {!isMobile && (
-                    <>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link to="/dashboard">Home</Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        {visibleItems.length > 0 && (
-                            <BreadcrumbSeparator>
-                                <ChevronRight className="h-4 w-4" />
-                            </BreadcrumbSeparator>
-                        )}
-                    </>
-                )}
-
-                {visibleItems.map((item, index) => {
-                    const isLast = index === visibleItems.length - 1;
-
-                    return (
-                        <React.Fragment key={item.path}>
-                            <BreadcrumbItem>
-                                {isLast ? (
-                                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
-                                ) : (
-                                    <BreadcrumbLink asChild>
-                                        <Link to={item.path}>{item.label}</Link>
-                                    </BreadcrumbLink>
-                                )}
-                            </BreadcrumbItem>
-                            {!isLast && (
-                                <BreadcrumbSeparator>
-                                    <ChevronRight className="h-4 w-4" />
-                                </BreadcrumbSeparator>
-                            )}
-                        </React.Fragment>
-                    );
-                })}
-            </BreadcrumbList>
-        </Breadcrumb>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbPage className="flex items-center gap-1">
+              Dashboard
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
     );
+  }
+
+  // Filter out "dashboard" segment to avoid duplication with root Dashboard link
+  const filteredSegments = segments.filter(
+    (segment) => segment.toLowerCase() !== "dashboard",
+  );
+
+  // Build breadcrumb path
+  let currentPath = "";
+  const breadcrumbs = filteredSegments.map((segment, index) => {
+    currentPath += `/${segment}`;
+    // For nested dashboard routes, prepend /dashboard to the path
+    const fullPath =
+      segments[0] === "dashboard" ? `/dashboard${currentPath}` : currentPath;
+    const isLast = index === filteredSegments.length - 1;
+
+    // Format segment name (capitalize and replace hyphens with spaces)
+    const displayName = segment
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    return {
+      path: fullPath,
+      name: displayName,
+      isLast,
+    };
+  });
+
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <Link to="/" className="flex items-center gap-1">
+              Dashboard
+            </Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        {breadcrumbs.map((crumb) => (
+          <React.Fragment key={crumb.path}>
+            <BreadcrumbSeparator>
+              <ChevronRight className="h-4 w-4" />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              {crumb.isLast ? (
+                <BreadcrumbPage>{crumb.name}</BreadcrumbPage>
+              ) : (
+                <BreadcrumbLink asChild>
+                  <Link to={crumb.path}>{crumb.name}</Link>
+                </BreadcrumbLink>
+              )}
+            </BreadcrumbItem>
+          </React.Fragment>
+        ))}
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
 }

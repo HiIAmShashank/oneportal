@@ -1,9 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { UnifiedAuthProvider } from "@one-portal/auth";
-import { Sonner } from "@one-portal/ui";
 import { msalInstance, getAuthConfig } from "./auth/msalInstance";
 import { PUBLIC_ROUTES } from "./config/routes";
+import { ThemedSonner } from "./components/ThemedSonner";
 import App from "./App";
 import "./app.css";
 import "./style.css";
@@ -34,6 +34,6 @@ root.render(
     >
       <App />
     </UnifiedAuthProvider>
-    <Sonner />
+    <ThemedSonner />
   </StrictMode>,
 );
