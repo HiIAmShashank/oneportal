@@ -8,120 +8,120 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as UnauthorizedRouteImport } from "./routes/unauthorized";
-import { Route as SignInRouteImport } from "./routes/sign-in";
-import { Route as EventsRouteImport } from "./routes/events";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as AuthCallbackRouteImport } from "./routes/auth/callback";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 
 const UnauthorizedRoute = UnauthorizedRouteImport.update({
-  id: "/unauthorized",
-  path: "/unauthorized",
+  id: '/unauthorized',
+  path: '/unauthorized',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const SignInRoute = SignInRouteImport.update({
-  id: "/sign-in",
-  path: "/sign-in",
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const EventsRoute = EventsRouteImport.update({
-  id: "/events",
-  path: "/events",
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: "/auth/callback",
-  path: "/auth/callback",
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/events": typeof EventsRoute;
-  "/sign-in": typeof SignInRoute;
-  "/unauthorized": typeof UnauthorizedRoute;
-  "/auth/callback": typeof AuthCallbackRoute;
+  '/': typeof IndexRoute
+  '/events': typeof EventsRoute
+  '/sign-in': typeof SignInRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/events": typeof EventsRoute;
-  "/sign-in": typeof SignInRoute;
-  "/unauthorized": typeof UnauthorizedRoute;
-  "/auth/callback": typeof AuthCallbackRoute;
+  '/': typeof IndexRoute
+  '/events': typeof EventsRoute
+  '/sign-in': typeof SignInRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/events": typeof EventsRoute;
-  "/sign-in": typeof SignInRoute;
-  "/unauthorized": typeof UnauthorizedRoute;
-  "/auth/callback": typeof AuthCallbackRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/events': typeof EventsRoute
+  '/sign-in': typeof SignInRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/events" | "/sign-in" | "/unauthorized" | "/auth/callback";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/events" | "/sign-in" | "/unauthorized" | "/auth/callback";
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/events' | '/sign-in' | '/unauthorized' | '/auth/callback'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/events' | '/sign-in' | '/unauthorized' | '/auth/callback'
   id:
-    | "__root__"
-    | "/"
-    | "/events"
-    | "/sign-in"
-    | "/unauthorized"
-    | "/auth/callback";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/events'
+    | '/sign-in'
+    | '/unauthorized'
+    | '/auth/callback'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  EventsRoute: typeof EventsRoute;
-  SignInRoute: typeof SignInRoute;
-  UnauthorizedRoute: typeof UnauthorizedRoute;
-  AuthCallbackRoute: typeof AuthCallbackRoute;
+  IndexRoute: typeof IndexRoute
+  EventsRoute: typeof EventsRoute
+  SignInRoute: typeof SignInRoute
+  UnauthorizedRoute: typeof UnauthorizedRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/unauthorized": {
-      id: "/unauthorized";
-      path: "/unauthorized";
-      fullPath: "/unauthorized";
-      preLoaderRoute: typeof UnauthorizedRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/sign-in": {
-      id: "/sign-in";
-      path: "/sign-in";
-      fullPath: "/sign-in";
-      preLoaderRoute: typeof SignInRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/events": {
-      id: "/events";
-      path: "/events";
-      fullPath: "/events";
-      preLoaderRoute: typeof EventsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/auth/callback": {
-      id: "/auth/callback";
-      path: "/auth/callback";
-      fullPath: "/auth/callback";
-      preLoaderRoute: typeof AuthCallbackRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/unauthorized': {
+      id: '/unauthorized'
+      path: '/unauthorized'
+      fullPath: '/unauthorized'
+      preLoaderRoute: typeof UnauthorizedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -131,7 +131,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   AuthCallbackRoute: AuthCallbackRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
