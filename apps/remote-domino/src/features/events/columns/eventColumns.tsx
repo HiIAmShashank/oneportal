@@ -61,9 +61,7 @@ export function createEventColumns(
       id: "application",
       accessorKey: "application",
       header: "Application",
-      cell: ({ getValue }) => (
-        <span className="font-medium">{getValue() as string}</span>
-      ),
+      cell: ({ getValue }) => <span>{getValue() as string}</span>,
       enableSorting: true,
       enableColumnFilter: true,
       meta: {
@@ -135,11 +133,7 @@ export function createEventColumns(
       header: "Created",
       cell: ({ getValue }) => {
         const date = getValue() as string;
-        return (
-          <span className="text-sm text-muted-foreground">
-            {formatRelativeDate(date)}
-          </span>
-        );
+        return <span>{formatRelativeDate(date)}</span>;
       },
       enableSorting: true,
       enableColumnFilter: true,
@@ -153,11 +147,7 @@ export function createEventColumns(
       header: "Last Activity",
       cell: ({ getValue }) => {
         const date = getValue() as string;
-        return (
-          <span className="text-sm text-muted-foreground">
-            {formatRelativeDate(date)}
-          </span>
-        );
+        return <span>{formatRelativeDate(date)}</span>;
       },
       enableSorting: true,
       enableColumnFilter: true,
@@ -165,7 +155,6 @@ export function createEventColumns(
         filterVariant: "date-range",
       },
     },
-
     {
       id: "jobs",
       accessorKey: "jobCount",

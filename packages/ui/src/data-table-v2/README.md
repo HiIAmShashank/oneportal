@@ -896,7 +896,7 @@ function ServerSideTable() {
   const [data, setData] = useState<User[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError | null>(null);
 
   const handleFetch = useCallback(async (params: ServerSideParams) => {
     setLoading(true);
@@ -926,31 +926,234 @@ function ServerSideTable() {
       features={{
         pagination: { enabled: true, pageSize: 25 },
         sorting: { enabled: true },
-        filters: { enabled: true },
+        filtering: { enabled: true },
         serverSide: {
           enabled: true,
           totalCount,
           loading,
           error,
           onFetch: handleFetch,
+          debounceMs: 300, // Debounce filters/search (default: 300ms)
         },
       }}
     />
   );
 }
+```
+
+#### Server-Side Parameters
+
+The `onFetch` callback receives comprehensive server parameters:
+
+```typescript
+interface ServerSideParams {
+  page: number; // 0-based page index
+  pageSize: number; // Rows per page
+
+  // Single-column sorting (deprecated, use sorting[] for multi-column)
+  sortBy?: string; // Column ID
+  sortOrder?: "asc" | "desc"; // Sort direction
+
+  // Multi-column sorting (recommended)
+  sorting?: Array<{ id: string; desc: boolean }>;
+
+  // Column filters
+  filters?: Record<string, unknown>; // { status: "active", role: "admin" }
+
+  // Global search term
+  globalFilter?: unknown;
+}
+```
+
+**Multi-Column Sorting Example:**
+
+```tsx
+const handleFetch = async (params: ServerSideParams) => {
+  // Use modern sorting array (supports multiple columns)
+  const orderBy = params.sorting?.map((s) => ({
+    field: s.id,
+    direction: s.desc ? "DESC" : "ASC",
+  }));
+
+  // Fallback to legacy single-column sorting
+  const legacySort = params.sortBy
+    ? [
+        {
+          field: params.sortBy,
+          direction: params.sortOrder === "desc" ? "DESC" : "ASC",
+        },
+      ]
+    : [];
+
+  await fetchUsers({
+    page: params.page,
+    pageSize: params.pageSize,
+    orderBy: orderBy || legacySort,
+    filters: params.filters,
+    search: params.globalFilter as string,
+  });
+};
+```
+
+#### Manual Refetch API
+
+Access the refetch function via `onTableReady` for manual data refresh:
+
+```tsx
+function ServerTableWithRefetch() {
+  const [refetch, setRefetch] = useState<() => void>();
+
+  const handleTableReady = (table: Table<User>, refetchFn?: () => void) => {
+    setRefetch(() => refetchFn);
+  };
+
+  return (
+    <>
+      <Button onClick={refetch}>Refresh Data</Button>
+      <DataTable
+        onTableReady={handleTableReady}
+        features={{
+          serverSide: {
+            enabled: true,
+            totalCount,
+            loading,
+            error,
+            onFetch: handleFetch,
+          },
+        }}
+      />
+    </>
+  );
+}
+```
+
+#### Hybrid Server-Side Mode
+
+**NEW:** Enable client-side filtering/sorting on server-fetched data for better UX:
+
+```tsx
+// Real-world example from remote-domino/events.tsx
+function EventsTable() {
+  const [eventTypeId, setEventTypeId] = useState<string>("");
+  const [applicationId, setApplicationId] = useState<string>("");
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Build query params (custom filters outside table)
+  const queryParams = {
+    pageNumber,
+    pageSize,
+    ...(eventTypeId && { eventTypeId }),
+    ...(applicationId && { applicationId }),
+  };
+
+  // Fetch with React Query
+  const { data, isLoading, error } = useEvents(queryParams);
+
+  // Server-side pagination handler
+  const handleServerFetch = (params: { page: number; pageSize: number }) => {
+    setPageNumber(params.page + 1); // API uses 1-based indexing
+    setPageSize(params.pageSize);
+  };
+
+  return (
+    <DataTable
+      data={data?.data ?? []}
+      columns={columns}
+      features={{
+        serverSide: {
+          enabled: true,
+          totalCount: data?.totalCount ?? 0,
+          loading: isLoading,
+          error: error,
+          onFetch: handleServerFetch,
+          // Hybrid mode: Server handles pagination, client handles sorting/filtering
+          clientSideFiltering: true, // Filter current page only
+          clientSideSorting: true, // Sort current page only
+        },
+      }}
+    />
+  );
+}
+```
+
+**When to use hybrid mode:**
+
+- ✅ **Large datasets** - Server paginates, client sorts/filters current page
+- ✅ **Performance** - Reduce server load, instant sorting/filtering
+- ✅ **Better UX** - No network delay for sort/filter on current page
+- ✅ **Custom server filters** - Use external filters (dropdowns), table handles page data
+- ❌ **Avoid if** - Need to filter/sort across ALL data (millions of rows)
+
+#### Troubleshooting Server-Side
+
+**Issue: Filters not triggering refetch**
+
+Filters are debounced (default 300ms). Check `debounceMs` config:
+
+```tsx
+serverSide: {
+  debounceMs: 300, // Increase for slower typing, decrease for faster response
+}
+```
+
+**Issue: Empty string filters sent to server**
+
+Empty strings are now filtered out automatically. If you need them:
+
+```tsx
+// In your server handler
+const filters = {
+  ...params.filters,
+  // Add custom handling for empty strings if needed
+};
+```
+
+**Issue: Page jumps to 1 on filter change**
+
+This is now prevented with `autoResetPageIndex: false`. If it still happens, ensure you're using server-side mode correctly:
+
+```tsx
+serverSide: {
+  enabled: true, // Must be true
+  clientSideFiltering: false, // Or true for hybrid mode
+}
+```
+
+**Issue: Stale data after mutations**
+
+Use the refetch API:
+
+```tsx
+const handleDelete = async (id: string) => {
+  await deleteUser(id);
+  refetch?.(); // Trigger data refresh
+};
+```
+
+**Issue: Network errors not showing**
+
+Ensure error state is passed:
+
+```tsx
+serverSide: {
+  error: queryError, // Pass React Query error or fetch error
+}
+```
 
 // With debounced search
 function DebouncedServerTable() {
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 500);
+const [search, setSearch] = useState("");
+const debouncedSearch = useDebounce(search, 500);
 
-  useEffect(() => {
-    // Fetch with debounced search value
-  }, [debouncedSearch]);
+useEffect(() => {
+// Fetch with debounced search value
+}, [debouncedSearch]);
 
-  // ...
+// ...
 }
-```
+
+````
 
 ### Persistence
 
@@ -989,7 +1192,7 @@ const { state, setState, clearState } = usePersistence({
 
 // Clear persisted state
 <Button onClick={clearState}>Reset Table</Button>
-```
+````
 
 ### States & Loading
 

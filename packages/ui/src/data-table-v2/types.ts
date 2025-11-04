@@ -137,7 +137,7 @@ export interface DataTableProps<TData> {
 
   // Advanced: Full TanStack Table instance access
   table?: Table<TData>;
-  onTableReady?: (table: Table<TData>) => void;
+  onTableReady?: (table: Table<TData>, refetch?: () => void) => void;
 
   // Styling
   className?: string;
@@ -264,6 +264,9 @@ export interface FeaturesConfig<TData = unknown> {
     // When true: sorting works client-side on current page data
     // When false (default): sorting is server-side
     clientSideSorting?: boolean;
+
+    // Debounce delay for filters/search (default: 300ms)
+    debounceMs?: number;
   };
 }
 
@@ -374,10 +377,11 @@ export interface BulkAction<TData> {
 export interface ServerSideParams {
   page: number;
   pageSize: number;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
+  sortBy?: string; // Deprecated: use sorting[] for multi-column support
+  sortOrder?: "asc" | "desc"; // Deprecated: use sorting[] for multi-column support
+  sorting?: Array<{ id: string; desc: boolean }>; // Multi-column sorting support
   filters?: Record<string, unknown>;
-  globalFilter?: string;
+  globalFilter?: unknown;
 }
 
 export interface ServerSideResponse<TData> {

@@ -280,6 +280,7 @@ export function useDataTable<TData>(
               serverSideConfig.totalCount / (paginationConfig.pageSize || 10),
             )
           : undefined,
+        autoResetPageIndex: false, // Prevent page jumping on filter/sort changes
       }),
 
       // Initial state for uncontrolled mode (only used if no customState provided)

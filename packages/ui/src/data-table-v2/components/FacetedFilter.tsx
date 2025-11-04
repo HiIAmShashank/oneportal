@@ -48,13 +48,19 @@ export function FacetedFilter<TData>({
   inline = false,
   density = "default",
 }: FacetedFilterProps<TData>) {
-  // Filter input height classes based on density
+  // Filter input height and text size classes based on density
   const filterHeightClasses = {
     compact: "h-7",
     default: "h-8",
     comfortable: "h-9",
   };
+  const filterTextClasses = {
+    compact: "text-xs",
+    default: "text-sm",
+    comfortable: "text-base",
+  };
   const filterHeight = filterHeightClasses[density];
+  const filterTextSize = filterTextClasses[density];
   const metadata = useFaceting(column);
   const filterValue = column.getFilterValue();
   const placeholder =
@@ -97,7 +103,11 @@ export function FacetedFilter<TData>({
           value={(filterValue as string) ?? ""}
           onChange={(e) => column.setFilterValue(e.target.value || undefined)}
           placeholder={placeholder}
-          className={cn(filterHeight, "placeholder:font-semibold")}
+          className={cn(
+            filterHeight,
+            filterTextSize,
+            "placeholder:font-semibold placeholder:text-muted-foreground",
+          )}
         />
       </div>
     );
@@ -160,7 +170,11 @@ export function FacetedFilter<TData>({
             <Button
               variant="outline"
               size="sm"
-              className={cn(filterHeight, "w-full justify-between")}
+              className={cn(
+                filterHeight,
+                filterTextSize,
+                "w-full justify-between font-thin text-muted-foreground",
+              )}
             >
               <span className="truncate">
                 {selected.length > 0
@@ -266,7 +280,11 @@ export function FacetedFilter<TData>({
             onChange={(e) => handleMinChange(e.target.value)}
             onBlur={(e) => handleMinChange(e.target.value)} // Filter on blur
             placeholder="Min"
-            className={cn(filterHeight, "placeholder:font-semibold")}
+            className={cn(
+              filterHeight,
+              filterTextSize,
+              "placeholder:font-semibold placeholder:text-muted-foreground",
+            )}
           />
           <Input
             type="number"
@@ -274,7 +292,11 @@ export function FacetedFilter<TData>({
             onChange={(e) => handleMaxChange(e.target.value)}
             onBlur={(e) => handleMaxChange(e.target.value)} // Filter on blur
             placeholder="Max"
-            className={cn(filterHeight, "placeholder:font-semibold")}
+            className={cn(
+              filterHeight,
+              filterTextSize,
+              "placeholder:font-semibold placeholder:text-muted-foreground",
+            )}
           />
         </div>
       </div>
@@ -309,9 +331,12 @@ export function FacetedFilter<TData>({
         >
           <SelectTrigger
             id={`filter-${column.id}`}
-            className={cn(filterHeight, "w-full")}
+            className={cn(filterHeight, filterTextSize, "w-full")}
           >
-            <SelectValue placeholder="All" className="font-semibold" />
+            <SelectValue
+              placeholder="All"
+              className="font-thin text-muted-foreground"
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">All</SelectItem>
@@ -336,7 +361,11 @@ export function FacetedFilter<TData>({
             <Input
               value={startValue}
               placeholder="Start date"
-              className={cn(filterHeight, "pr-8 placeholder:font-semibold")}
+              className={cn(
+                filterHeight,
+                filterTextSize,
+                "pr-8 placeholder:font-semibold placeholder:text-muted-foreground",
+              )}
               onChange={(e) => {
                 const val = e.target.value;
                 setStartValue(val);
@@ -404,7 +433,11 @@ export function FacetedFilter<TData>({
             <Input
               value={endValue}
               placeholder="End date"
-              className={cn(filterHeight, "pr-8 placeholder:font-semibold")}
+              className={cn(
+                filterHeight,
+                filterTextSize,
+                "pr-8 placeholder:font-semibold placeholder:text-muted-foreground",
+              )}
               onChange={(e) => {
                 const val = e.target.value;
                 setEndValue(val);
@@ -491,11 +524,11 @@ export function FacetedFilter<TData>({
         >
           <SelectTrigger
             id={`filter-${column.id}`}
-            className={cn(filterHeight, "w-full")}
+            className={cn(filterHeight, filterTextSize, "w-full")}
           >
             <SelectValue
               placeholder={`All ${title || column.id}`}
-              className="font-semibold"
+              className="font-thin text-muted-foreground"
             />
           </SelectTrigger>
           <SelectContent>
@@ -528,7 +561,11 @@ export function FacetedFilter<TData>({
         value={(filterValue as string) ?? ""}
         onChange={(e) => column.setFilterValue(e.target.value || undefined)}
         placeholder={placeholder}
-        className={cn(filterHeight, "placeholder:font-semibold")}
+        className={cn(
+          filterHeight,
+          filterTextSize,
+          "placeholder:font-semibold placeholder:text-muted-foreground",
+        )}
       />
     </div>
   );

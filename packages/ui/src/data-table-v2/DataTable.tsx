@@ -59,6 +59,7 @@ import {
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { useDataTable } from "./hooks/useDataTable";
 import { usePersistence } from "./hooks/usePersistence";
+import { useDebounce } from "./utils/debounce";
 import { TablePagination } from "./components/TablePagination";
 import { DataTableToolbar } from "./components/DataTableToolbar";
 import { FacetedFilter } from "./components/FacetedFilter";
@@ -395,11 +396,6 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
     onStateChange,
   });
 
-  // Expose table instance to parent
-  React.useEffect(() => {
-    onTableReady?.(table);
-  }, [table, onTableReady]);
-
   // Persist table state changes to localStorage
   React.useEffect(() => {
     if (persistence && persistence.enabled !== false) {
@@ -446,6 +442,19 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
     }
   }, [table.getState().rowSelection, features?.selection, state?.rowSelection]);
 
+  // Debounce configuration
+  const debounceMs = features?.serverSide?.debounceMs ?? 300;
+
+  // Debounce filters and global filter for server-side
+  const debouncedColumnFilters = useDebounce(
+    table.getState().columnFilters,
+    debounceMs,
+  );
+  const debouncedGlobalFilter = useDebounce(
+    table.getState().globalFilter,
+    debounceMs,
+  );
+
   // Build server-side fetch function
   const handleServerFetch = React.useCallback(() => {
     if (features?.serverSide?.enabled && features.serverSide.onFetch) {
@@ -455,8 +464,13 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
       // Skip if clientSideFiltering is enabled (filters are client-side only)
       const filters: Record<string, unknown> = {};
       if (!features.serverSide.clientSideFiltering) {
-        for (const filter of tableState.columnFilters) {
-          if (filter.value !== undefined && filter.value !== null) {
+        for (const filter of debouncedColumnFilters) {
+          // Skip undefined, null, and empty strings
+          if (
+            filter.value !== undefined &&
+            filter.value !== null &&
+            filter.value !== ""
+          ) {
             filters[filter.id] = filter.value;
           }
         }
@@ -466,7 +480,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
       const params = {
         page: tableState.pagination.pageIndex,
         pageSize: tableState.pagination.pageSize,
-        // Skip sorting if clientSideSorting is enabled (sorting is client-side only)
+        // Legacy single-column sorting (deprecated, use sorting array)
         sortBy: features.serverSide.clientSideSorting
           ? undefined
           : tableState.sorting[0]?.id,
@@ -475,37 +489,54 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
           : tableState.sorting[0]?.desc
             ? ("desc" as const)
             : ("asc" as const),
+        // Modern multi-column sorting
+        sorting:
+          features.serverSide.clientSideSorting || !tableState.sorting.length
+            ? undefined
+            : tableState.sorting.map((s) => ({ id: s.id, desc: s.desc })),
         filters,
-        // Use client-side global filter when clientSideFiltering is enabled
+        // Use debounced global filter
         globalFilter: features.serverSide.clientSideFiltering
           ? undefined
-          : (tableState.globalFilter as string | undefined),
+          : debouncedGlobalFilter,
       };
 
       // Trigger fetch callback
       features.serverSide.onFetch(params);
     }
-  }, [features?.serverSide, table]);
+  }, [
+    features?.serverSide,
+    table,
+    debouncedColumnFilters,
+    debouncedGlobalFilter,
+  ]);
 
   // Handle server-side data fetching
+  // Extract state values to avoid recreating arrays in dependency array
+  const pageIndex = table.getState().pagination.pageIndex;
+  const pageSize = table.getState().pagination.pageSize;
+  const sorting = table.getState().sorting;
+  const sortingKey = JSON.stringify(sorting); // Stable reference for sorting array
+
   React.useEffect(() => {
-    handleServerFetch();
+    if (features?.serverSide?.enabled) {
+      handleServerFetch();
+    }
   }, [
     handleServerFetch,
-    table.getState().pagination.pageIndex,
-    table.getState().pagination.pageSize,
+    features?.serverSide?.enabled,
+    pageIndex,
+    pageSize,
     // Only re-fetch on sorting changes if NOT using clientSideSorting
-    ...(features?.serverSide?.clientSideSorting
-      ? []
-      : [table.getState().sorting]),
-    // Only re-fetch on filter changes if NOT using clientSideFiltering
-    ...(features?.serverSide?.clientSideFiltering
-      ? []
-      : [table.getState().columnFilters]),
-    ...(features?.serverSide?.clientSideFiltering
-      ? []
-      : [table.getState().globalFilter]),
+    // Use stringified key for stable reference
+    ...(features?.serverSide?.clientSideSorting ? [] : [sortingKey]),
+    // Debounced filters will trigger refetch via handleServerFetch deps
   ]);
+
+  // Expose table instance and refetch function to parent
+  React.useEffect(() => {
+    onTableReady?.(table, handleServerFetch);
+  }, [table, onTableReady, handleServerFetch]);
 
   // Extract UI config with defaults
   const density = currentDensity;
@@ -662,16 +693,24 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                         className={cn(
                           "group", // Add group for hover effects
                           cellPaddingClasses[density],
-                          "text-left align-middle font-medium",
+                          "text-left align-middle font-bold",
                           "text-muted-foreground dark:text-muted-foreground",
                           "[&:has([role=checkbox])]:pr-0",
-                          "relative after:absolute after:right-0 after:top-3 after:bottom-3 after:w-px after:bg-border",
-                          "last:after:hidden",
+                          "relative",
+                          // Column separator border (only for non-pinned columns)
+                          !isPinned &&
+                            "after:absolute after:right-0 after:top-3 after:bottom-3 after:w-px after:bg-border last:after:hidden",
                           // Special handling for expand column to prevent cutoff
                           header.column.id === "expand" && "px-2!",
                           variantClasses[variant],
                           (stickyHeader || isPinned) &&
                             "bg-background dark:bg-background",
+                          // Left-pinned column shadow (on right edge) using ::before
+                          isPinned === "left" &&
+                            "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-gradient-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
+                          // Right-pinned column shadow (on left edge) using ::after
+                          isPinned === "right" &&
+                            "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-gradient-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                         )}
                       >
                         {header.isPlaceholder ? null : reorderingEnabled &&
@@ -810,8 +849,15 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                         className={cn(
                           cellPaddingClasses[density],
                           densityClasses[density],
+                          "relative",
                           (stickyHeader || isPinned) &&
                             "bg-muted/30 dark:bg-muted/20",
+                          // Left-pinned column shadow (on right edge) using ::before
+                          isPinned === "left" &&
+                            "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-gradient-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
+                          // Right-pinned column shadow (on left edge) using ::after
+                          isPinned === "right" &&
+                            "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-gradient-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                         )}
                       >
                         {/* Show filter only for non-special columns that allow filtering */}
@@ -1006,11 +1052,19 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                             className={cn(
                               cellPaddingClasses[density],
                               densityClasses[density],
-                              "align-middle",
+                              "align-middle relative",
                               "[&:has([role=checkbox])]:pr-0",
                               // Special handling for expand column to prevent cutoff
                               cell.column.id === "expand" && "!px-2",
                               variantClasses[variant],
+                              // Add background to pinned cells to prevent text overlap
+                              isPinned && "bg-background dark:bg-background",
+                              // Left-pinned column shadow (on right edge) using ::before
+                              isPinned === "left" &&
+                                "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-gradient-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
+                              // Right-pinned column shadow (on left edge) using ::after
+                              isPinned === "right" &&
+                                "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-gradient-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                             )}
                           >
                             {/* Special columns (expand, select, actions) - always render normally */}
@@ -1125,10 +1179,16 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                         }}
                         className={cn(
                           cellPaddingClasses[density],
-                          "text-left align-middle",
+                          "text-left align-middle relative",
                           "text-muted-foreground dark:text-muted-foreground",
                           variantClasses[variant],
                           isPinned && "bg-muted/50 dark:bg-muted/20",
+                          // Left-pinned column shadow (on right edge) using ::before
+                          isPinned === "left" &&
+                            "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-gradient-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
+                          // Right-pinned column shadow (on left edge) using ::after
+                          isPinned === "right" &&
+                            "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-gradient-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                         )}
                       >
                         {footer.isPlaceholder
