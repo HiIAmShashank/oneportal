@@ -1,0 +1,24 @@
+import { createMsalInstanceWithConfig } from "@one-portal/auth";
+
+/**
+ * MSAL Instance for Project Directory
+ *
+ * Uses the factory pattern from @one-portal/auth to create a configured
+ * MSAL instance with the app's authentication configuration.
+ *
+ * Configuration is loaded from environment variables in .env.local
+ *
+ * Benefits of factory pattern:
+ * - Consistent configuration across all remote apps
+ * - Automatic validation of environment variables
+ * - Built-in error handling and logging
+ * - Single source of truth for auth configuration
+ */
+const { instance, authConfig } =
+  createMsalInstanceWithConfig("project-directory");
+
+export const msalInstance = instance;
+
+export function getAuthConfig() {
+  return authConfig;
+}

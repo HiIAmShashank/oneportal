@@ -7,8 +7,10 @@ import { AppLayout } from "../components/AppLayout";
 import { ThemeProvider } from "../components/ThemeProvider";
 import { PUBLIC_ROUTES } from "../config/routes";
 import { checkSuperUser } from "../api";
+import { NotFound } from "../components/NotFound";
 
 export const Route = createRootRoute({
+  notFoundComponent: NotFound,
   beforeLoad: async ({ location, preload }) => {
     if ((PUBLIC_ROUTES as readonly string[]).includes(location.pathname)) {
       return;

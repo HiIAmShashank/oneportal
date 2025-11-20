@@ -1,0 +1,49 @@
+import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { createProtectedRouteGuard } from "@one-portal/auth/guards";
+import { safeRedirect } from "@one-portal/auth/utils";
+import { msalInstance, getAuthConfig } from "../auth/msalInstance";
+import { AppLayout } from "../components/AppLayout";
+import { PUBLIC_ROUTES } from "../config/routes";
+import { NotFound } from "../components/NotFound";
+
+export const Route = createRootRoute({
+  notFoundComponent: NotFound,
+  beforeLoad: async ({ location, preload }) => {
+    // Skip authentication for public routes
+    if (PUBLIC_ROUTES.includes(location.pathname as any)) {
+      return;
+    }
+
+    // Create route guard configuration
+    // SECURITY: Always enforce authentication in both embedded and standalone modes
+    const guard = createProtectedRouteGuard(msalInstance, {
+      scopes: getAuthConfig().scopes,
+      skipRedirectOnPreload: true, // Prevents redirects during lazy-loading
+      onUnauthenticated: (returnUrl: string) => {
+        const signInUrl = `/sign-in?returnUrl=${encodeURIComponent(returnUrl)}`;
+        safeRedirect(signInUrl, "/sign-in");
+      },
+      onAuthError: (error: Error) => {
+        console.error("[Project Directory] Route guard auth error:", error);
+      },
+    });
+
+    await guard({ location, preload });
+  },
+
+  component: () => {
+    const { pathname } = window.location;
+    const isPublicRoute = PUBLIC_ROUTES.includes(pathname as any);
+
+    // Don't render AppLayout on public routes
+    if (isPublicRoute) {
+      return <Outlet />;
+    }
+
+    return (
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
+    );
+  },
+});

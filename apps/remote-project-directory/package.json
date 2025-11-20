@@ -1,0 +1,40 @@
+{
+  "name": "@one-portal/remote-project-directory",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:azure": "vite --mode azure",
+    "build": "tsc -b && vite build",
+    "build:azure": "tsc -b && vite build --mode azure",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@one-portal/auth": "workspace:*",
+    "@one-portal/config": "workspace:*",
+    "@one-portal/ui": "workspace:*",
+    "@tanstack/react-query": "^5.90.2",
+    "@tanstack/react-router": "^1.132.47",
+    "lucide-react": "^0.545.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-federation": "^1.4.1",
+    "@tailwindcss/vite": "^4.1.14",
+    "@tanstack/router-cli": "^1.132.47",
+    "@tanstack/router-plugin": "^1.132.51",
+    "@types/node": "^24.6.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.37.0",
+    "tailwindcss": "^4.1.14",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.9"
+  }
+}

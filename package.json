@@ -38,7 +38,7 @@
     "knip": "^5.65.0",
     "lint-staged": "^15.2.11",
     "prettier": "^3.5.4",
-    "turbo": "^2.5.8",
+    "turbo": "^2.6.1",
     "typescript": "~5.9.3",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^2.1.8"
