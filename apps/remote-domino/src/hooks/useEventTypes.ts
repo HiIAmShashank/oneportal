@@ -6,24 +6,28 @@
 
 import { useAuthenticatedQuery } from "./useAuthenticatedQuery";
 import { fetchEventTypes } from "../api";
-import type { PaginatedEventTypesResponse } from "../api";
+import type {
+  PaginatedEventTypesResponse,
+  FetchEventTypesParams,
+} from "../api";
 
 /**
- * Hook to fetch event types
+ * Hook to fetch event types with optional pagination
  *
+ * @param params - Optional pagination parameters
  * @returns React Query result with event types data
  *
  * @example
  * ```typescript
- * const { data, isLoading, error } = useEventTypes();
+ * const { data, isLoading, error } = useEventTypes({ pageNumber: 1, pageSize: 100 });
  * ```
  */
-export function useEventTypes() {
+export function useEventTypes(params?: FetchEventTypesParams) {
   return useAuthenticatedQuery<PaginatedEventTypesResponse>(
-    ["eventTypes"],
-    (token) => fetchEventTypes(token),
+    ["eventTypes", params],
+    (token) => fetchEventTypes(token, params),
     {
-      staleTime: 5 * 60 * 1000, // 5 minutes - event types don't change often
+      staleTime: 60 * 1000, // 1 minute
       retry: 2,
     },
   );

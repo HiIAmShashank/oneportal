@@ -6,24 +6,28 @@
 
 import { useAuthenticatedQuery } from "./useAuthenticatedQuery";
 import { fetchApplications } from "../api";
-import type { PaginatedApplicationsResponse } from "../api";
+import type {
+  PaginatedApplicationsResponse,
+  FetchApplicationsParams,
+} from "../api";
 
 /**
- * Hook to fetch applications
+ * Hook to fetch applications with optional pagination
  *
+ * @param params - Optional pagination parameters
  * @returns React Query result with applications data
  *
  * @example
  * ```typescript
- * const { data, isLoading, error } = useApplications();
+ * const { data, isLoading, error } = useApplications({ pageNumber: 1, pageSize: 100 });
  * ```
  */
-export function useApplications() {
+export function useApplications(params?: FetchApplicationsParams) {
   return useAuthenticatedQuery<PaginatedApplicationsResponse>(
-    ["applications"],
-    (token) => fetchApplications(token),
+    ["applications", params],
+    (token) => fetchApplications(token, params),
     {
-      staleTime: 5 * 60 * 1000, // 5 minutes - applications don't change often
+      staleTime: 60 * 1000, // 1 minute
       retry: 2,
     },
   );

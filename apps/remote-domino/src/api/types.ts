@@ -77,3 +77,19 @@ export interface FetchEventsParams {
   applicationId?: string;
   correlationId?: string;
 }
+
+/**
+ * Parameters for fetching event types with optional pagination
+ */
+export interface FetchEventTypesParams {
+  pageNumber?: number;
+  pageSize?: number;
+}
+
+/**
+ * Parameters for fetching applications with optional pagination
+ */
+export interface FetchApplicationsParams {
+  pageNumber?: number;
+  pageSize?: number;
+}

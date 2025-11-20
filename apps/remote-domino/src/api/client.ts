@@ -10,8 +10,14 @@ import type {
   PaginatedEventTypesResponse,
   PaginatedApplicationsResponse,
   FetchEventsParams,
+  FetchEventTypesParams,
+  FetchApplicationsParams,
 } from "./types";
-import { API_ENDPOINTS } from "./constants";
+import {
+  API_ENDPOINTS,
+  DEFAULT_PAGE_NUMBER,
+  DEFAULT_PAGE_SIZE,
+} from "./constants";
 
 /**
  * API Request Options
@@ -143,8 +149,8 @@ export async function fetchEvents(
   params?: FetchEventsParams,
 ): Promise<PaginatedEventsResponse> {
   const queryString = buildQueryString({
-    pageNumber: params?.pageNumber,
-    pageSize: params?.pageSize,
+    pageNumber: params?.pageNumber ?? DEFAULT_PAGE_NUMBER,
+    pageSize: params?.pageSize ?? DEFAULT_PAGE_SIZE,
     eventTypeId: params?.eventTypeId,
     applicationId: params?.applicationId,
     correlationId: params?.correlationId,
@@ -157,19 +163,20 @@ export async function fetchEvents(
 }
 
 /**
- * Fetch event types
+ * Fetch event types with optional pagination
  *
  * @param token - Access token from MSAL
+ * @param params - Optional pagination parameters
  * @returns Promise resolving to paginated event types response
  * @throws ApiError if API call fails
  */
 export async function fetchEventTypes(
   token: string,
+  params?: FetchEventTypesParams,
 ): Promise<PaginatedEventTypesResponse> {
-  // Fetch all event types without pagination limits for filtering
   const queryString = buildQueryString({
-    pageNumber: 1,
-    pageSize: 500, // Large page size to get all event types
+    pageNumber: params?.pageNumber ?? DEFAULT_PAGE_NUMBER,
+    pageSize: params?.pageSize ?? DEFAULT_PAGE_SIZE,
   });
 
   return await apiRequest<PaginatedEventTypesResponse>(
@@ -179,19 +186,20 @@ export async function fetchEventTypes(
 }
 
 /**
- * Fetch applications
+ * Fetch applications with optional pagination
  *
  * @param token - Access token from MSAL
+ * @param params - Optional pagination parameters
  * @returns Promise resolving to paginated applications response
  * @throws ApiError if API call fails
  */
 export async function fetchApplications(
   token: string,
+  params?: FetchApplicationsParams,
 ): Promise<PaginatedApplicationsResponse> {
-  // Fetch all applications without pagination limits for filtering
   const queryString = buildQueryString({
-    pageNumber: 1,
-    pageSize: 500, // Large page size to get all applications
+    pageNumber: params?.pageNumber ?? DEFAULT_PAGE_NUMBER,
+    pageSize: params?.pageSize ?? DEFAULT_PAGE_SIZE,
   });
 
   return await apiRequest<PaginatedApplicationsResponse>(

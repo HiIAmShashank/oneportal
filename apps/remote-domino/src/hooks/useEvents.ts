@@ -28,7 +28,7 @@ export function useEvents(params?: FetchEventsParams) {
     ["events", params],
     (token) => fetchEvents(token, params),
     {
-      staleTime: 30 * 1000, // 30 seconds
+      staleTime: 60 * 1000, // 1 minute
       retry: 2,
     },
   );
