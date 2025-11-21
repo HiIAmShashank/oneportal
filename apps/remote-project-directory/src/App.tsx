@@ -3,6 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { createQueryClient } from "@one-portal/config";
 import { isAuthError } from "@one-portal/auth/utils";
 import { routeTree } from "./routeTree.gen";
+import { UserProvider } from "./contexts/UserContext";
 
 // Create QueryClient with auth-aware retry logic
 const queryClient = createQueryClient({ shouldSkipRetry: isAuthError });
@@ -36,7 +37,9 @@ declare module "@tanstack/react-router" {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <UserProvider>
+        <RouterProvider router={router} />
+      </UserProvider>
     </QueryClientProvider>
   );
 }

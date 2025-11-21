@@ -14,6 +14,10 @@ interface ImportMetaEnv {
   readonly VITE_PROJECT_DIRECTORY_AUTH_POST_LOGOUT_REDIRECT_URI?: string;
   readonly VITE_PROJECT_DIRECTORY_AUTH_SCOPES: string;
 
+  // API Configuration (app-specific)
+  readonly VITE_PROJECT_DIRECTORY_API_BASE_URL?: string;
+  readonly VITE_PROJECT_DIRECTORY_API_SUBSCRIPTION_KEY?: string;
+
   // App Mode (shared across all apps)
   readonly VITE_APP_MODE?: "auto" | "standalone" | "embedded";
 
