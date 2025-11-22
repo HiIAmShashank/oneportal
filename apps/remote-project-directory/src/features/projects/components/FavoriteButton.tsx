@@ -6,12 +6,14 @@ import { cn } from "@one-portal/ui";
 interface FavoriteButtonProps {
   projectId: number;
   isFavourite: boolean;
+  projectName: string;
   className?: string;
 }
 
 export function FavoriteButton({
   projectId,
   isFavourite,
+  projectName,
   className,
 }: FavoriteButtonProps) {
   const { mutate, isPending } = useToggleFavorite();
@@ -19,7 +21,7 @@ export function FavoriteButton({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click
     if (isPending) return;
-    mutate({ projectId, isFavourite });
+    mutate({ projectId, isFavourite, projectName });
   };
 
   return (

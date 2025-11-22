@@ -8,10 +8,14 @@ import { acquireToken } from "@one-portal/auth/utils/acquireToken";
 import { updateFavouriteProject } from "../api/client";
 import { type GetProjectsResponse } from "../api/types";
 import { useUserContext } from "../contexts/UserContext";
+import { toast } from "@one-portal/ui";
+import { Check, CircleX } from "lucide-react";
+import React from "react";
 
 interface ToggleFavoriteParams {
   projectId: number;
   isFavourite: boolean;
+  projectName: string;
 }
 
 export function useToggleFavorite() {
@@ -86,6 +90,24 @@ export function useToggleFavorite() {
           queryClient.setQueryData(queryKey, data);
         });
       }
+      toast("Error updating favorites", {
+        icon: React.createElement(CircleX, {
+          className: "h-4 w-4 text-red-500",
+        }),
+      });
+    },
+    onSuccess: (_data, variables) => {
+      const { isFavourite, projectName } = variables;
+      // isFavourite passed in is the OLD state.
+      // If it WAS favorite, we removed it.
+      // If it WAS NOT favorite, we added it.
+      const action = isFavourite ? "removed from" : "added to";
+
+      toast(`${projectName} ${action} favorites`, {
+        icon: React.createElement(Check, {
+          className: "h-4 w-4 text-green-500",
+        }),
+      });
     },
     onSettled: () => {
       // Always refetch after error or success:

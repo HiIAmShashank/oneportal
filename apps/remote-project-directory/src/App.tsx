@@ -4,6 +4,7 @@ import { createQueryClient } from "@one-portal/config";
 import { isAuthError } from "@one-portal/auth/utils";
 import { routeTree } from "./routeTree.gen";
 import { UserProvider } from "./contexts/UserContext";
+import { Sonner } from "@one-portal/ui";
 
 // Create QueryClient with auth-aware retry logic
 const queryClient = createQueryClient({ shouldSkipRetry: isAuthError });
@@ -39,6 +40,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <UserProvider>
         <RouterProvider router={router} />
+        <Sonner />
       </UserProvider>
     </QueryClientProvider>
   );

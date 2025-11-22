@@ -13,6 +13,7 @@ export const projectColumns: ColumnDef<Project>[] = [
       <FavoriteButton
         projectId={row.original.id}
         isFavourite={row.original.isFavourite}
+        projectName={row.original.projectName}
       />
     ),
     enablePinning: false,
