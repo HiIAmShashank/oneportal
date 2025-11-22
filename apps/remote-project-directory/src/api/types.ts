@@ -21,7 +21,7 @@ export interface Project {
   contractType: string;
   countryISOCode: string;
   countryName: string;
-  description: any;
+  description: string;
   divisionCode: string;
   expectedEndDate: string;
   feeEarningDate?: string;
@@ -30,10 +30,10 @@ export interface Project {
   lastEvaluationDate: string;
   levelOfControl: number;
   mainOrSubProject: string;
-  masterServiceAgreementProjectNumber: any;
+  masterServiceAgreementProjectNumber: string;
   opportunityNumber?: string;
   parentProjectName: string;
-  parentProjectNumber: any;
+  parentProjectNumber: string;
   parentProjectPortfolioCode: string;
   portfolioCode: string;
   projectManager: string;
@@ -84,4 +84,10 @@ export interface GetProjectsRequest {
 export interface GetProjectsResponse {
   projects: Project[];
   count: number;
+}
+
+export interface UpdateFavouriteRequest {
+  UserId: number;
+  ProjectId: number;
+  UpdateType: 0 | 1; // 0 = Add, 1 = Remove
 }

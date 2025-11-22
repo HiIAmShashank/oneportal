@@ -11,12 +11,7 @@ import { Badge } from "@one-portal/ui";
 import { Combobox } from "../../../components/ui/combobox";
 import { DateRangePicker } from "../../../components/ui/date-range-picker";
 import { type GetProjectsRequest } from "../../../api/types";
-import {
-  SlidersHorizontal,
-  Search,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { format, type DateRange } from "@one-portal/ui";
 
 interface ProjectFiltersProps {
@@ -85,7 +80,10 @@ export function ProjectFilters({ onFilter }: ProjectFiltersProps) {
             <SlidersHorizontal className="h-4 w-4" />
             Filters
             {activeFiltersCount > 0 && (
-              <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1">
+              <Badge
+                variant="default"
+                className="ml-1 h-5 min-w-5 rounded-full"
+              >
                 {activeFiltersCount}
               </Badge>
             )}
@@ -204,10 +202,7 @@ export function ProjectFilters({ onFilter }: ProjectFiltersProps) {
             <Button variant="outline" onClick={handleReset}>
               Reset
             </Button>
-            <Button onClick={handleApply}>
-              <Search className="mr-2 h-4 w-4" />
-              Apply Filters
-            </Button>
+            <Button onClick={handleApply}>Apply Filters</Button>
           </div>
         </div>
       </CollapsibleContent>

@@ -79,6 +79,7 @@ export function ProjectsTable() {
           // Disable client-side filtering as we are using server-side filters
           filtering: {
             enabled: false,
+            mode: "faceted",
           },
           serverSide: {
             enabled: false, // Disable server-side mode to keep client features

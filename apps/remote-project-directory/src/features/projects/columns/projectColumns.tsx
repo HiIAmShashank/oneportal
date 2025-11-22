@@ -1,8 +1,24 @@
 import { type ColumnDef } from "@one-portal/ui/data-table-v2";
 import { type Project } from "../../../api/types";
 import { Badge } from "@one-portal/ui";
+import { FavoriteButton } from "../components/FavoriteButton";
 
 export const projectColumns: ColumnDef<Project>[] = [
+  {
+    id: "favorite",
+    header: "",
+    maxSize: 20,
+    enableResizing: false,
+    cell: ({ row }) => (
+      <FavoriteButton
+        projectId={row.original.id}
+        isFavourite={row.original.isFavourite}
+      />
+    ),
+    enablePinning: false,
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "projectNumber",
     header: "Project Number",
