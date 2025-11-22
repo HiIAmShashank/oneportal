@@ -58,6 +58,10 @@ type NormalizedPaginationConfig = {
   manual?: boolean;
   initialState?: PaginationState;
   onChange?: (state: PaginationState) => void;
+  autoResetPageIndex?: boolean;
+  pageCount?: number;
+  rowCount?: number;
+  showFirstLastButtons?: boolean;
 };
 
 /**
@@ -117,7 +121,15 @@ export function useDataTable<TData>(
     if (features.pagination === false) return { enabled: false, pageSize: 10 };
     if (features.pagination === true || features.pagination === undefined)
       return { enabled: true, pageSize: 10 };
-    return { enabled: true, pageSize: 10, ...features.pagination };
+    return {
+      enabled: true,
+      pageSize: 10,
+      ...features.pagination,
+      autoResetPageIndex: features.pagination.autoResetPageIndex,
+      pageCount: features.pagination.pageCount,
+      rowCount: features.pagination.rowCount,
+      showFirstLastButtons: features.pagination.showFirstLastButtons,
+    };
   }, [features.pagination]);
 
   // Selection config
@@ -228,6 +240,10 @@ export function useDataTable<TData>(
         !serverSideConfig.enabled && {
           getPaginationRowModel: getPaginationRowModel(),
         }),
+      // Pass pageCount if provided (for manual/hybrid pagination)
+      ...(paginationConfig.pageCount !== undefined && {
+        pageCount: paginationConfig.pageCount,
+      }),
       manualPagination: serverSideConfig.enabled,
 
       // Row selection
@@ -280,8 +296,14 @@ export function useDataTable<TData>(
               serverSideConfig.totalCount / (paginationConfig.pageSize || 10),
             )
           : undefined,
-        autoResetPageIndex: false, // Prevent page jumping on filter/sort changes
+        // Note: autoResetPageIndex is handled at the top level now to support client-side override
       }),
+
+      // Auto-reset page index (can be overridden by pagination config)
+      // Fix: Default to false if server-side is enabled, unless explicitly overridden
+      autoResetPageIndex:
+        paginationConfig.autoResetPageIndex ??
+        (serverSideConfig.enabled ? false : undefined),
 
       // Initial state for uncontrolled mode (only used if no customState provided)
       initialState: {

@@ -50,6 +50,7 @@ export {
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
 } from "./components/ui/breadcrumb";
+export { Calendar } from "./components/ui/calendar";
 export {
   Collapsible,
   CollapsibleContent,
@@ -177,6 +178,8 @@ export { AuthLoadingSpinner } from "./components/auth/AuthLoadingSpinner";
 // Utilities
 export { cn } from "./lib/utils";
 export { useIsMobile } from "./hooks/use-mobile";
+export { format } from "date-fns";
+export type { DateRange } from "react-day-picker";
 
 // DataTable Component (V2)
 export * from "./data-table-v2";

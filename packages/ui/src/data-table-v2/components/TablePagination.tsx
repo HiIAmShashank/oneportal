@@ -26,6 +26,8 @@ interface TablePaginationProps<TData> {
   pageSizeOptions?: number[];
   showPageInfo?: boolean;
   showPageSizeSelector?: boolean;
+  rowCount?: number;
+  showFirstLastButtons?: boolean;
 }
 
 export function TablePagination<TData>({
@@ -33,6 +35,8 @@ export function TablePagination<TData>({
   pageSizeOptions = [10, 20, 30, 40, 50],
   showPageInfo = true,
   showPageSizeSelector = true,
+  rowCount,
+  showFirstLastButtons = true,
 }: TablePaginationProps<TData>) {
   const pageIndex = table.getState().pagination.pageIndex;
   const pageSize = table.getState().pagination.pageSize;
@@ -41,7 +45,8 @@ export function TablePagination<TData>({
   const canNextPage = table.getCanNextPage();
 
   // Calculate showing range
-  const totalRows = table.getFilteredRowModel().rows.length;
+  // Use provided rowCount if available, otherwise fallback to filtered rows length
+  const totalRows = rowCount ?? table.getFilteredRowModel().rows.length;
   const startRow = pageIndex * pageSize + 1;
   const endRow = Math.min((pageIndex + 1) * pageSize, totalRows);
 
@@ -82,14 +87,16 @@ export function TablePagination<TData>({
 
       {/* Right: Navigation buttons */}
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.setPageIndex(0)}
-          disabled={!canPreviousPage}
-        >
-          <ChevronsLeft className="h-4 w-4" />
-        </Button>
+        {showFirstLastButtons && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.setPageIndex(0)}
+            disabled={!canPreviousPage}
+          >
+            <ChevronsLeft className="h-4 w-4" />
+          </Button>
+        )}
         <Button
           variant="outline"
           size="sm"
@@ -114,14 +121,16 @@ export function TablePagination<TData>({
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.setPageIndex(pageCount - 1)}
-          disabled={!canNextPage}
-        >
-          <ChevronsRight className="h-4 w-4" />
-        </Button>
+        {showFirstLastButtons && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.setPageIndex(pageCount - 1)}
+            disabled={!canNextPage}
+          >
+            <ChevronsRight className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   );

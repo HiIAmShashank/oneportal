@@ -1,5 +1,9 @@
 import { API_ENDPOINTS } from "./constants";
-import { type ApiUser } from "./types";
+import {
+  type ApiUser,
+  type GetProjectsRequest,
+  type GetProjectsResponse,
+} from "./types";
 
 interface ApiRequestOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
@@ -88,4 +92,20 @@ export async function fetchUser(
   username: string,
 ): Promise<ApiUser> {
   return await apiRequest<ApiUser>(API_ENDPOINTS.USER, token, username);
+}
+
+export async function fetchProjects(
+  token: string,
+  username: string,
+  request: GetProjectsRequest,
+): Promise<GetProjectsResponse> {
+  return apiRequest<GetProjectsResponse>(
+    API_ENDPOINTS.PROJECTS,
+    token,
+    username,
+    {
+      method: "POST",
+      body: request,
+    },
+  );
 }
