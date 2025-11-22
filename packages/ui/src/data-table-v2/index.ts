@@ -30,6 +30,7 @@ export type {
   DataTableProps,
   ColumnDef,
   ColumnMeta,
+  ColumnFiltersState,
   FeaturesConfig,
   UIConfig,
   PersistenceConfig,

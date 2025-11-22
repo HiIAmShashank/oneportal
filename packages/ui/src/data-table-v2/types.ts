@@ -65,7 +65,7 @@ export type ColumnDef<TData, TValue = unknown> = TanStackColumnDef<
 /**
  * Re-export ColumnMeta from TanStack Table (extended via declaration merging above)
  */
-export type { ColumnMeta } from "@tanstack/react-table";
+export type { ColumnMeta, ColumnFiltersState } from "@tanstack/react-table";
 
 // ============================================================================
 // MAIN DATATABLE PROPS
@@ -193,6 +193,10 @@ export interface FeaturesConfig<TData = unknown> {
         manual?: boolean;
         initialState?: PaginationState;
         onChange?: (state: PaginationState) => void;
+        autoResetPageIndex?: boolean;
+        pageCount?: number;
+        rowCount?: number;
+        showFirstLastButtons?: boolean;
       };
 
   // Row Selection

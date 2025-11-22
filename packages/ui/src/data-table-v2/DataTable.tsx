@@ -1226,6 +1226,16 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
               ? features.pagination.showPageSizeSelector
               : true
           }
+          rowCount={
+            typeof features?.pagination === "object"
+              ? features.pagination.rowCount
+              : undefined
+          }
+          showFirstLastButtons={
+            typeof features?.pagination === "object"
+              ? features.pagination.showFirstLastButtons
+              : true
+          }
         />
       )}
     </div>
