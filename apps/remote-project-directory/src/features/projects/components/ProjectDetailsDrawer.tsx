@@ -4,7 +4,6 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
-  Badge,
   Separator,
 } from "@one-portal/ui";
 import { type Project } from "../../../api/types";
@@ -81,18 +80,6 @@ export function ProjectDetailsDrawer({
         <SheetHeader className="p-6 pb-4 border-b">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="font-mono">
-                  {project.projectNumber}
-                </Badge>
-                <Badge
-                  variant={
-                    project.projectStatus === "Active" ? "default" : "secondary"
-                  }
-                >
-                  {project.projectStatus}
-                </Badge>
-              </div>
               <SheetTitle className="text-xl">{project.projectName}</SheetTitle>
             </div>
           </div>
@@ -103,6 +90,14 @@ export function ProjectDetailsDrawer({
 
         <div className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-8">
+            <DetailSection title="Project Identification">
+              <DetailItem
+                label="Project Number"
+                value={project.projectNumber}
+              />
+              <DetailItem label="Status" value={project.projectStatus} />
+            </DetailSection>
+
             <DetailSection title="General Information">
               <DetailItem label="Client" value={project.clientName} />
               <DetailItem label="Client Number" value={project.clientNumber} />

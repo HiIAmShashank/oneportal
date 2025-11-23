@@ -300,10 +300,11 @@ export function useDataTable<TData>(
       }),
 
       // Auto-reset page index (can be overridden by pagination config)
-      // Fix: Default to false if server-side is enabled, unless explicitly overridden
+      // Fix: Default to true if not provided, unless manually disabled.
+      // This ensures client-side filtering resets pagination.
       autoResetPageIndex:
         paginationConfig.autoResetPageIndex ??
-        (serverSideConfig.enabled ? false : undefined),
+        (serverSideConfig.enabled ? false : true),
 
       // Initial state for uncontrolled mode (only used if no customState provided)
       initialState: {

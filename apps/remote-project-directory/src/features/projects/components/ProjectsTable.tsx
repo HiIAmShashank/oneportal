@@ -1,8 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { DataTable, type FeaturesConfig } from "@one-portal/ui";
+import {
+  type ColumnFiltersState,
+  DataTable,
+  type FeaturesConfig,
+} from "@one-portal/ui";
 import { useProjects } from "../../../hooks/useProjects";
 import { projectColumns } from "../columns/projectColumns";
-import { Loader2 } from "lucide-react";
 import { ProjectFilters } from "./ProjectFilters";
 import { type Project } from "../../../api/types";
 import { ProjectDetailsDrawer } from "./ProjectDetailsDrawer";
@@ -64,6 +67,14 @@ export function ProjectsTable() {
     pageSize: 10,
   });
 
+  // Client-side filter state
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  // Reset pagination when client-side filters change
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [columnFilters]);
+
   // Handle row click to open drawer
   const handleRowClick = useCallback((row: Project) => {
     setSelectedProject(row);
@@ -110,13 +121,20 @@ export function ProjectsTable() {
         pageSizeOptions: [10, 20, 50],
         autoResetPageIndex: false,
         onChange: setPagination,
-        pageCount: Math.ceil(totalCount / pagination.pageSize),
-        rowCount: totalCount,
+        // If filters are applied, let table handle pageCount (set to undefined)
+        // Otherwise, use server totalCount
+        pageCount:
+          columnFilters.length > 0
+            ? undefined
+            : Math.ceil(totalCount / pagination.pageSize),
+        rowCount: columnFilters.length > 0 ? undefined : totalCount,
         showFirstLastButtons: false,
       },
-      filters: {
-        mode: "inline",
+      filtering: {
+        mode: "faceted",
         enabled: true,
+        // Pass filter state control
+        onChange: setColumnFilters,
       },
       serverSide: {
         enabled: false,
@@ -128,7 +146,7 @@ export function ProjectsTable() {
         pinning: true,
       },
     }),
-    [totalCount, pagination.pageSize],
+    [totalCount, pagination.pageSize, columnFilters.length],
   );
 
   // Memoize UI config
@@ -146,8 +164,9 @@ export function ProjectsTable() {
   const tableState = useMemo(
     () => ({
       pagination,
+      columnFilters,
     }),
-    [pagination],
+    [pagination, columnFilters],
   );
 
   return (
@@ -170,16 +189,6 @@ export function ProjectsTable() {
         ui={ui}
         onRowClick={handleRowClick}
       />
-
-      {/* Loading indicator for infinite scroll */}
-      {isFetchingNextPage && (
-        <div className="flex justify-center py-4">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          <span className="ml-2 text-sm text-muted-foreground">
-            Loading more projects...
-          </span>
-        </div>
-      )}
 
       {/* Project Details Drawer */}
       <ProjectDetailsDrawer
