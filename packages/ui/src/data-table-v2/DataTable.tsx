@@ -651,7 +651,10 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
       >
         <table
           className={cn("w-full caption-bottom", densityClasses[density])}
-          style={{ tableLayout: "fixed" }}
+          style={{
+            tableLayout: "fixed",
+            minWidth: table.getTotalSize(),
+          }}
         >
           {/* Table Head */}
           <thead
@@ -693,6 +696,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                         className={cn(
                           "group", // Add group for hover effects
                           cellPaddingClasses[density],
+                          header.column.columnDef.meta?.headerClassName,
                           "text-left align-middle font-bold",
                           "text-muted-foreground dark:text-muted-foreground",
                           "[&:has([role=checkbox])]:pr-0",
@@ -1052,6 +1056,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                             className={cn(
                               cellPaddingClasses[density],
                               densityClasses[density],
+                              cell.column.columnDef.meta?.cellClassName,
                               "align-middle relative",
                               "[&:has([role=checkbox])]:pr-0",
                               // Special handling for expand column to prevent cutoff

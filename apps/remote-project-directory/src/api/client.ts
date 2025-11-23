@@ -1,5 +1,6 @@
 import { API_ENDPOINTS } from "./constants";
 import {
+  type UpdateFavouriteRequest,
   type ApiUser,
   type GetProjectsRequest,
   type GetProjectsResponse,
@@ -67,6 +68,15 @@ async function apiRequest<T>(
       throw new ApiError(response.status, response.statusText);
     }
 
+    if (response.status === 204) {
+      return {} as T;
+    }
+
+    const contentLength = response.headers.get("Content-Length");
+    if (contentLength === "0") {
+      return {} as T;
+    }
+
     return await response.json();
   } catch (error) {
     clearTimeout(timeoutId);
@@ -93,7 +103,6 @@ export async function fetchUser(
 ): Promise<ApiUser> {
   return await apiRequest<ApiUser>(API_ENDPOINTS.USER, token, username);
 }
-
 export async function fetchProjects(
   token: string,
   username: string,
@@ -108,4 +117,15 @@ export async function fetchProjects(
       body: request,
     },
   );
+}
+
+export async function updateFavouriteProject(
+  token: string,
+  username: string,
+  request: UpdateFavouriteRequest,
+): Promise<void> {
+  return apiRequest<void>(API_ENDPOINTS.UPDATE_FAVOURITE, token, username, {
+    method: "POST",
+    body: request,
+  });
 }

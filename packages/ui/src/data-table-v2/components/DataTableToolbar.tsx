@@ -42,7 +42,7 @@ export function DataTableToolbar<TData>({
     table.getState().columnFilters.length > 0 || globalFilterValue;
 
   return (
-    <div className="space-y-4 bg-background dark:bg-background py-3">
+    <div className="space-y-4 bg-background dark:bg-background py-3 pt-0">
       {/* Global Search */}
       {globalSearch && (
         <div className="flex items-center gap-2">
