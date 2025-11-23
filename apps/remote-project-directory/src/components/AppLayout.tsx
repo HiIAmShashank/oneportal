@@ -27,7 +27,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </header>
-          <div className="flex flex-1 flex-col max-h-[calc(100vh-70px)] overflow-auto">
+          <div className="flex flex-1 flex-col max-h-[calc(100vh-70px)] overflow-auto min-w-0">
             {children}
           </div>
         </SidebarInset>
