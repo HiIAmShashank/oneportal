@@ -655,6 +655,12 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
             const visibleCells = row.getVisibleCells();
             return visibleCells.map((cell, cellIndex) => {
               const isPinned = cell.column.getIsPinned();
+              const isLastLeftPinned =
+                isPinned === "left" &&
+                visibleCells[cellIndex + 1]?.column.getIsPinned() !== "left";
+              const isFirstRightPinned =
+                isPinned === "right" &&
+                visibleCells[cellIndex - 1]?.column.getIsPinned() !== "right";
 
               // Check if this is the first data column for row expansion indentation
               // Skip special columns (expand, select, actions) and apply to first content column
@@ -715,10 +721,10 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                     // Add background to pinned cells to prevent text overlap
                     isPinned && "bg-background dark:bg-background",
                     // Left-pinned column shadow (on right edge) using ::before
-                    isPinned === "left" &&
+                    isLastLeftPinned &&
                       "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-linear-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
                     // Right-pinned column shadow (on left edge) using ::after
-                    isPinned === "right" &&
+                    isFirstRightPinned &&
                       "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-linear-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                   )}
                 >
@@ -868,8 +874,16 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                   key={`${headerGroup.id}-header`}
                   className="hover:bg-muted/50 dark:hover:bg-muted/50 transition-colors"
                 >
-                  {headerGroup.headers.map((header) => {
+                  {headerGroup.headers.map((header, index) => {
                     const isPinned = header.column.getIsPinned();
+                    const isLastLeftPinned =
+                      isPinned === "left" &&
+                      headerGroup.headers[index + 1]?.column.getIsPinned() !==
+                        "left";
+                    const isFirstRightPinned =
+                      isPinned === "right" &&
+                      headerGroup.headers[index - 1]?.column.getIsPinned() !==
+                        "right";
                     const canResize = header.column.getCanResize();
 
                     return (
@@ -907,10 +921,10 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                           (stickyHeader || isPinned) &&
                             "bg-background dark:bg-background",
                           // Left-pinned column shadow (on right edge) using ::before
-                          isPinned === "left" &&
+                          isLastLeftPinned &&
                             "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-linear-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
                           // Right-pinned column shadow (on left edge) using ::after
-                          isPinned === "right" &&
+                          isFirstRightPinned &&
                             "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-linear-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                         )}
                       >
@@ -1022,8 +1036,16 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                   key={`${headerGroup.id}-filters`}
                   className="bg-muted/30 dark:bg-muted/20 border-b border-border dark:border-border"
                 >
-                  {headerGroup.headers.map((header) => {
+                  {headerGroup.headers.map((header, index) => {
                     const isPinned = header.column.getIsPinned();
+                    const isLastLeftPinned =
+                      isPinned === "left" &&
+                      headerGroup.headers[index + 1]?.column.getIsPinned() !==
+                        "left";
+                    const isFirstRightPinned =
+                      isPinned === "right" &&
+                      headerGroup.headers[index - 1]?.column.getIsPinned() !==
+                        "right";
                     const isSpecialColumn = [
                       "select",
                       "expand",
@@ -1052,12 +1074,14 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                           densityClasses[density],
                           "relative",
                           (stickyHeader || isPinned) &&
-                            "bg-muted/30 dark:bg-muted/20",
+                            (isPinned
+                              ? "bg-sidebar dark:bg-muted"
+                              : "bg-muted/30 dark:bg-muted/20"),
                           // Left-pinned column shadow (on right edge) using ::before
-                          isPinned === "left" &&
+                          isLastLeftPinned &&
                             "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-linear-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
                           // Right-pinned column shadow (on left edge) using ::after
-                          isPinned === "right" &&
+                          isFirstRightPinned &&
                             "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-linear-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                         )}
                       >
@@ -1238,8 +1262,16 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                   key={footerGroup.id}
                   className="bg-muted/50 dark:bg-muted/20 font-medium"
                 >
-                  {footerGroup.headers.map((footer) => {
+                  {footerGroup.headers.map((footer, index) => {
                     const isPinned = footer.column.getIsPinned();
+                    const isLastLeftPinned =
+                      isPinned === "left" &&
+                      footerGroup.headers[index + 1]?.column.getIsPinned() !==
+                        "left";
+                    const isFirstRightPinned =
+                      isPinned === "right" &&
+                      footerGroup.headers[index - 1]?.column.getIsPinned() !==
+                        "right";
 
                     return (
                       <th
@@ -1266,10 +1298,10 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                           variantClasses[variant],
                           isPinned && "bg-muted/50 dark:bg-muted/20",
                           // Left-pinned column shadow (on right edge) using ::before
-                          isPinned === "left" &&
+                          isLastLeftPinned &&
                             "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-linear-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
                           // Right-pinned column shadow (on left edge) using ::after
-                          isPinned === "right" &&
+                          isFirstRightPinned &&
                             "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-linear-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                         )}
                       >
