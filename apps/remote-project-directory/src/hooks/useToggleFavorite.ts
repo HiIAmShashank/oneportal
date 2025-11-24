@@ -112,6 +112,8 @@ export function useToggleFavorite() {
     onSettled: () => {
       // Always refetch after error or success:
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+      // Also refetch user profile to update favorites list
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 }

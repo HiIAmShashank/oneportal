@@ -8,18 +8,25 @@ import type { MenuItem } from "../types/menu";
  */
 export const menuItems: MenuItem[] = [
   {
-    name: "Home",
-    path: "/",
-    icon: "Home",
+    name: "Dashboard",
+    path: "/dashboard",
+    icon: "LayoutDashboard",
     order: 1,
-    description: "Home page",
+    description: "Overview and statistics",
   },
   {
-    name: "About",
-    path: "/about",
-    icon: "Info",
+    name: "All Projects",
+    path: "/",
+    icon: "Home",
     order: 2,
-    description: "About this app",
+    description: "Directory of all projects",
+  },
+  {
+    name: "My Projects",
+    path: "/my-projects",
+    icon: "Star",
+    order: 3,
+    description: "Your favorite projects",
   },
 ];
 

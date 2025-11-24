@@ -1,6 +1,14 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { Home, Info, ChevronRight, LogOut, User } from "lucide-react";
+import {
+  Home,
+  Info,
+  ChevronRight,
+  LogOut,
+  User,
+  LayoutDashboard,
+  Star,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -30,6 +38,8 @@ import type { MenuItem } from "../types/menu";
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Home,
   Info,
+  LayoutDashboard,
+  Star,
 };
 
 /**

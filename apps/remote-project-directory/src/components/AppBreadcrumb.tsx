@@ -28,7 +28,7 @@ function formatBreadcrumbLabel(segment: string): string {
  * Features:
  * - Mobile: Shows last 2 levels only
  * - Desktop: Shows full breadcrumb path
- * - Home link defaults to '/'
+ * - Root is always "Project Directory" linking to "/"
  */
 export function AppBreadcrumb() {
   const location = useLocation();
@@ -50,52 +50,58 @@ export function AppBreadcrumb() {
       ? breadcrumbItems.slice(-2)
       : breadcrumbItems;
 
-  // If no breadcrumbs (root path), show nothing
-  if (breadcrumbItems.length === 0) {
-    return null;
-  }
+  // Helper to render "Project Directory" root link
+  const renderRootLink = () => (
+    <BreadcrumbItem>
+      <BreadcrumbLink asChild>
+        <Link to="/">Project Directory</Link>
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+  );
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {/* Always show Home link on desktop */}
+        {/* Always show Root link on desktop */}
         {!isMobile && (
           <>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            {visibleItems.length > 0 && (
-              <BreadcrumbSeparator>
-                <ChevronRight className="h-4 w-4" />
-              </BreadcrumbSeparator>
-            )}
+            {renderRootLink()}
+            <BreadcrumbSeparator>
+              <ChevronRight className="h-4 w-4" />
+            </BreadcrumbSeparator>
           </>
         )}
 
-        {visibleItems.map((item, index) => {
-          const isLast = index === visibleItems.length - 1;
+        {/* Handle Root Page (All Projects) */}
+        {breadcrumbItems.length === 0 ? (
+          <BreadcrumbItem>
+            <BreadcrumbPage>All Projects</BreadcrumbPage>
+          </BreadcrumbItem>
+        ) : (
+          // Handle Other Pages
+          visibleItems.map((item, index) => {
+            const isLast = index === visibleItems.length - 1;
 
-          return (
-            <React.Fragment key={item.path}>
-              <BreadcrumbItem>
-                {isLast ? (
-                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <Link to={item.path}>{item.label}</Link>
-                  </BreadcrumbLink>
+            return (
+              <React.Fragment key={item.path}>
+                <BreadcrumbItem>
+                  {isLast ? (
+                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <Link to={item.path}>{item.label}</Link>
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {!isLast && (
+                  <BreadcrumbSeparator>
+                    <ChevronRight className="h-4 w-4" />
+                  </BreadcrumbSeparator>
                 )}
-              </BreadcrumbItem>
-              {!isLast && (
-                <BreadcrumbSeparator>
-                  <ChevronRight className="h-4 w-4" />
-                </BreadcrumbSeparator>
-              )}
-            </React.Fragment>
-          );
-        })}
+              </React.Fragment>
+            );
+          })
+        )}
       </BreadcrumbList>
     </Breadcrumb>
   );
