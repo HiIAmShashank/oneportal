@@ -1,48 +1,28 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@one-portal/ui";
+import { createFileRoute } from "@tanstack/react-router";
+import { AuthLoadingSpinner } from "@one-portal/ui";
 
+/**
+ * OAuth callback route for Azure AD authentication
+ *
+ * This route receives the OAuth redirect from Azure AD after user signs in.
+ * The actual authentication processing and redirect is handled by:
+ * - UnifiedAuthProvider initializes MsalInitializer
+ * - MsalInitializer.initializeRemoteStandalone() calls handleRedirectPromise()
+ * - After auth succeeds, MsalInitializer reads returnUrl and redirects user
+ *
+ * This component just needs to exist and show a loading state while that happens.
+ */
 export const Route = createFileRoute("/auth/callback")({
-  component: AuthCallbackPage,
+  component: AuthCallbackComponent,
 });
 
-function AuthCallbackPage() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Parse return URL from query params
-    const params = new URLSearchParams(window.location.search);
-    const returnUrl = params.get("returnUrl") || "/";
-
-    // Redirect after a brief delay to show the loading message
-    const timer = setTimeout(() => {
-      navigate({ to: returnUrl });
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [navigate]);
-
+function AuthCallbackComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Authentication Successful</CardTitle>
-          <CardDescription>
-            Redirecting you back to the application...
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Please wait while we complete the authentication process.
-          </p>
-        </CardContent>
-      </Card>
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <AuthLoadingSpinner
+        title="Completing sign-in..."
+        description="Please wait while we complete your authentication."
+      />
     </div>
   );
 }
