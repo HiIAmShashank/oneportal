@@ -172,6 +172,7 @@ export interface FeaturesConfig<TData = unknown> {
         columns?: boolean;
         initialState?: ColumnFiltersState;
         onChange?: (state: ColumnFiltersState) => void;
+        onGlobalFilterChange?: (filter: string) => void;
       };
 
   // Filtering (modern "filters" prop)

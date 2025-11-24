@@ -69,11 +69,12 @@ export function ProjectsTable() {
 
   // Client-side filter state
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState<string>("");
 
   // Reset pagination when client-side filters change
   useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [columnFilters]);
+  }, [columnFilters, globalFilter]);
 
   // Handle row click to open drawer
   const handleRowClick = useCallback((row: Project) => {
@@ -124,10 +125,11 @@ export function ProjectsTable() {
         // If filters are applied, let table handle pageCount (set to undefined)
         // Otherwise, use server totalCount
         pageCount:
-          columnFilters.length > 0
+          columnFilters.length > 0 || globalFilter
             ? undefined
             : Math.ceil(totalCount / pagination.pageSize),
-        rowCount: columnFilters.length > 0 ? undefined : totalCount,
+        rowCount:
+          columnFilters.length > 0 || globalFilter ? undefined : totalCount,
         showFirstLastButtons: false,
       },
       filtering: {
@@ -135,6 +137,7 @@ export function ProjectsTable() {
         enabled: true,
         // Pass filter state control
         onChange: setColumnFilters,
+        onGlobalFilterChange: setGlobalFilter,
       },
       serverSide: {
         enabled: false,
@@ -146,7 +149,7 @@ export function ProjectsTable() {
         pinning: true,
       },
     }),
-    [totalCount, pagination.pageSize, columnFilters.length],
+    [totalCount, pagination.pageSize, columnFilters.length, globalFilter],
   );
 
   // Memoize UI config
@@ -165,8 +168,9 @@ export function ProjectsTable() {
     () => ({
       pagination,
       columnFilters,
+      globalFilter,
     }),
-    [pagination, columnFilters],
+    [pagination, columnFilters, globalFilter],
   );
 
   return (

@@ -47,6 +47,7 @@ type NormalizedFilteringConfig = {
   columns: boolean;
   initialState?: ColumnFiltersState;
   onChange?: (state: ColumnFiltersState) => void;
+  onGlobalFilterChange?: (filter: string) => void;
 };
 
 type NormalizedPaginationConfig = {
@@ -115,6 +116,11 @@ export function useDataTable<TData>(
       ...features.filtering,
     };
   }, [features.filtering]);
+
+  // Extend NormalizedFilteringConfig type locally to include onGlobalFilterChange
+  // since we updated it in types.ts but TypeScript inference here might need help
+  // or the type definition above needs updating.
+  // Let's update the type definition at the top of the file instead.
 
   // Pagination config
   const paginationConfig: NormalizedPaginationConfig = useMemo(() => {
@@ -352,6 +358,9 @@ export function useDataTable<TData>(
       }),
       ...(filteringConfig.onChange && {
         onColumnFiltersChange: filteringConfig.onChange,
+      }),
+      ...(filteringConfig.onGlobalFilterChange && {
+        onGlobalFilterChange: filteringConfig.onGlobalFilterChange,
       }),
       ...(paginationConfig.onChange && {
         onPaginationChange: paginationConfig.onChange,
