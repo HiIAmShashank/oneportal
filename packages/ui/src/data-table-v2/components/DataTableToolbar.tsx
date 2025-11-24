@@ -41,6 +41,15 @@ export function DataTableToolbar<TData>({
   const hasFilters =
     table.getState().columnFilters.length > 0 || globalFilterValue;
 
+  // Debounce helper for global search input
+  const [inputValue, setInputValue] = React.useState(
+    (globalFilterValue as string) ?? "",
+  );
+
+  React.useEffect(() => {
+    setInputValue((globalFilterValue as string) ?? "");
+  }, [globalFilterValue]);
+
   return (
     <div className="space-y-4 bg-background dark:bg-background py-3 pt-0">
       {/* Global Search */}
@@ -50,10 +59,11 @@ export function DataTableToolbar<TData>({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              value={(globalFilterValue as string) ?? ""}
-              onChange={(e) =>
-                table.setGlobalFilter(e.target.value || undefined)
-              }
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                table.setGlobalFilter(e.target.value || undefined);
+              }}
               placeholder={globalSearchPlaceholder}
               className="pl-10"
             />

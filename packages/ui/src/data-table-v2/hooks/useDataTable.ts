@@ -47,6 +47,7 @@ type NormalizedFilteringConfig = {
   columns: boolean;
   initialState?: ColumnFiltersState;
   onChange?: (state: ColumnFiltersState) => void;
+  onGlobalFilterChange?: (filter: string) => void;
 };
 
 type NormalizedPaginationConfig = {
@@ -115,6 +116,11 @@ export function useDataTable<TData>(
       ...features.filtering,
     };
   }, [features.filtering]);
+
+  // Extend NormalizedFilteringConfig type locally to include onGlobalFilterChange
+  // since we updated it in types.ts but TypeScript inference here might need help
+  // or the type definition above needs updating.
+  // Let's update the type definition at the top of the file instead.
 
   // Pagination config
   const paginationConfig: NormalizedPaginationConfig = useMemo(() => {
@@ -300,10 +306,11 @@ export function useDataTable<TData>(
       }),
 
       // Auto-reset page index (can be overridden by pagination config)
-      // Fix: Default to false if server-side is enabled, unless explicitly overridden
+      // Fix: Default to true if not provided, unless manually disabled.
+      // This ensures client-side filtering resets pagination.
       autoResetPageIndex:
         paginationConfig.autoResetPageIndex ??
-        (serverSideConfig.enabled ? false : undefined),
+        (serverSideConfig.enabled ? false : true),
 
       // Initial state for uncontrolled mode (only used if no customState provided)
       initialState: {
@@ -351,6 +358,9 @@ export function useDataTable<TData>(
       }),
       ...(filteringConfig.onChange && {
         onColumnFiltersChange: filteringConfig.onChange,
+      }),
+      ...(filteringConfig.onGlobalFilterChange && {
+        onGlobalFilterChange: filteringConfig.onGlobalFilterChange,
       }),
       ...(paginationConfig.onChange && {
         onPaginationChange: paginationConfig.onChange,

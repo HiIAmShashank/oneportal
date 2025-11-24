@@ -45,7 +45,9 @@ import {
   type RowSelectionState,
   type ColumnOrderState,
   type ColumnSizingState,
+  type Row,
 } from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   DndContext,
   closestCenter,
@@ -96,6 +98,9 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
     className,
     containerClassName,
   } = props;
+
+  // Ref for virtualization
+  const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Initialize persistence hook
   const { saveState, restoreState } = usePersistence(persistence);
@@ -605,9 +610,197 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
     [table],
   );
 
+  // Virtualization setup
+  const rowVirtualizer = useVirtualizer({
+    count: table.getRowModel().rows.length,
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: React.useCallback(
+      (index) => {
+        const rowHeight = features?.virtualization?.rowHeight;
+        if (typeof rowHeight === "function") {
+          const row = table.getRowModel().rows[index];
+          return row ? rowHeight(row.original) : 48;
+        }
+        return (rowHeight as number) ?? 48;
+      },
+      [features?.virtualization?.rowHeight, table],
+    ),
+    overscan: features?.virtualization?.overscan ?? 10,
+    enabled: features?.virtualization?.enabled === true,
+    getItemKey: React.useCallback(
+      (index: number) => table.getRowModel().rows[index]?.id ?? index,
+      [table],
+    ),
+  });
+
   // ============================================================================
   // RENDER
   // ============================================================================
+
+  const renderRow = React.useCallback(
+    (row: Row<TData>) => (
+      <React.Fragment key={row.id}>
+        <tr
+          onClick={() => onRowClick?.(row.original)}
+          className={cn(
+            "border-b border-border dark:border-border transition-colors",
+            "hover:bg-muted/50 dark:hover:bg-muted/50",
+            onRowClick && "cursor-pointer",
+            variant === "striped" && "even:bg-muted/30 dark:even:bg-muted/20",
+          )}
+          data-state={row.getIsSelected() ? "selected" : undefined}
+        >
+          {(() => {
+            // Cache visible cells once per row for performance
+            const visibleCells = row.getVisibleCells();
+            return visibleCells.map((cell, cellIndex) => {
+              const isPinned = cell.column.getIsPinned();
+
+              // Check if this is the first data column for row expansion indentation
+              // Skip special columns (expand, select, actions) and apply to first content column
+              const firstDataColumnIndex = visibleCells.findIndex(
+                (c) =>
+                  c.column.id !== "expand" &&
+                  c.column.id !== "select" &&
+                  c.column.id !== "actions",
+              );
+              const isFirstDataColumn = cellIndex === firstDataColumnIndex;
+
+              // Calculate indentation based on row depth for hierarchical data
+              // Use larger multiplier (2.5rem per level) for better visibility
+              const depthIndentation =
+                isFirstDataColumn && row.depth > 0
+                  ? `${row.depth * 2.5}rem`
+                  : undefined;
+
+              return (
+                <td
+                  key={cell.id}
+                  style={{
+                    width: `${cell.column.getSize()}px`,
+                    // Pinning styles
+                    position: isPinned ? "sticky" : "relative",
+                    left:
+                      isPinned === "left"
+                        ? `${cell.column.getStart("left")}px`
+                        : undefined,
+                    right:
+                      isPinned === "right"
+                        ? `${cell.column.getAfter("right")}px`
+                        : undefined,
+                    zIndex: isPinned ? 9 : undefined,
+                    // Add indentation based on row depth for hierarchical data
+                    // Only applied to first data column for visual tree structure
+                    paddingLeft: depthIndentation,
+                  }}
+                  onClick={(e) => {
+                    if (onCellClick) {
+                      e.stopPropagation();
+                      onCellClick({
+                        row: row.original,
+                        columnId: cell.column.id,
+                        value: cell.getValue(),
+                      });
+                    }
+                  }}
+                  className={cn(
+                    cellPaddingClasses[density],
+                    densityClasses[density],
+                    cell.column.columnDef.meta?.cellClassName,
+                    "align-middle relative",
+                    "[&:has([role=checkbox])]:pr-0",
+                    // Special handling for expand column to prevent cutoff
+                    cell.column.id === "expand" && "px-2!",
+                    variantClasses[variant],
+                    // Add background to pinned cells to prevent text overlap
+                    isPinned && "bg-background dark:bg-background",
+                    // Left-pinned column shadow (on right edge) using ::before
+                    isPinned === "left" &&
+                      "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-linear-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
+                    // Right-pinned column shadow (on left edge) using ::after
+                    isPinned === "right" &&
+                      "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-linear-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
+                  )}
+                >
+                  {/* Special columns (expand, select, actions) - always render normally */}
+                  {["expand", "select", "actions"].includes(cell.column.id) ? (
+                    flexRender(cell.column.columnDef.cell, cell.getContext())
+                  ) : /* Grouped cell with expand/collapse */
+                  cell.getIsGrouped() ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          row.toggleExpanded();
+                        }}
+                        className="inline-flex items-center justify-center h-6 w-6 rounded-sm hover:bg-muted/50 dark:hover:bg-muted/50 transition-colors"
+                      >
+                        {row.getIsExpanded() ? (
+                          <span className="text-sm">▼</span>
+                        ) : (
+                          <span className="text-sm">▶</span>
+                        )}
+                      </button>
+                      <span className="font-medium">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </span>
+                      <span className="text-xs text-muted-foreground dark:text-muted-foreground">
+                        ({row.subRows.length})
+                      </span>
+                    </div>
+                  ) : cell.getIsAggregated() ? (
+                    /* Aggregated cell */
+                    <div className="font-medium">
+                      {flexRender(
+                        cell.column.columnDef.aggregatedCell ??
+                          cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </div>
+                  ) : cell.getIsPlaceholder() ? null : (
+                    /* Normal cell */
+                    <div className="truncate">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </div>
+                  )}
+                </td>
+              );
+            });
+          })()}
+        </tr>
+        {/* Custom expandable content (detail panel) - renders immediately after parent row */}
+        {row.getIsExpanded() && features?.expanding?.renderExpandedRow && (
+          <tr>
+            <td
+              colSpan={row.getAllCells().length}
+              className={cn(
+                cellPaddingClasses[density],
+                "bg-muted/30 dark:bg-muted/10",
+              )}
+            >
+              {features.expanding.renderExpandedRow(row)}
+            </td>
+          </tr>
+        )}
+      </React.Fragment>
+    ),
+    [
+      onRowClick,
+      variant,
+      density,
+      cellPaddingClasses,
+      densityClasses,
+      variantClasses,
+      onCellClick,
+      features?.expanding,
+    ],
+  );
 
   const tableContent = (
     <div
@@ -639,13 +832,17 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
 
       {/* Table Container */}
       <div
+        ref={tableContainerRef}
         className={cn(
           "relative w-full",
           "rounded-md border border-border dark:border-border",
           "bg-background dark:bg-background",
           // Only add overflow-auto when NOT in loading state to prevent scrollwheel flicker
-          !isLoading && "overflow-auto",
-          stickyHeader && "max-h-[600px]",
+          // Ensure overflow is handled when virtualization is enabled
+          (!isLoading || features?.virtualization?.enabled) && "overflow-auto",
+          // Add max height for virtualization or sticky header
+          (stickyHeader || features?.virtualization?.enabled) &&
+            "max-h-[600px]",
           className,
         )}
       >
@@ -711,10 +908,10 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                             "bg-background dark:bg-background",
                           // Left-pinned column shadow (on right edge) using ::before
                           isPinned === "left" &&
-                            "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-gradient-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
+                            "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-linear-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
                           // Right-pinned column shadow (on left edge) using ::after
                           isPinned === "right" &&
-                            "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-gradient-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
+                            "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-linear-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                         )}
                       >
                         {header.isPlaceholder ? null : reorderingEnabled &&
@@ -858,10 +1055,10 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                             "bg-muted/30 dark:bg-muted/20",
                           // Left-pinned column shadow (on right edge) using ::before
                           isPinned === "left" &&
-                            "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-gradient-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
+                            "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-linear-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
                           // Right-pinned column shadow (on left edge) using ::after
                           isPinned === "right" &&
-                            "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-gradient-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
+                            "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-linear-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                         )}
                       >
                         {/* Show filter only for non-special columns that allow filtering */}
@@ -986,165 +1183,45 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
             {!isLoading &&
               !hasError &&
               !isEmpty &&
-              table.getRowModel().rows.map((row) => (
-                <React.Fragment key={row.id}>
-                  <tr
-                    onClick={() => onRowClick?.(row.original)}
-                    className={cn(
-                      "border-b border-border dark:border-border transition-colors",
-                      "hover:bg-muted/50 dark:hover:bg-muted/50",
-                      onRowClick && "cursor-pointer",
-                      variant === "striped" &&
-                        "even:bg-muted/30 dark:even:bg-muted/20",
-                    )}
-                    data-state={row.getIsSelected() ? "selected" : undefined}
-                  >
-                    {(() => {
-                      // Cache visible cells once per row for performance
-                      const visibleCells = row.getVisibleCells();
-                      return visibleCells.map((cell, cellIndex) => {
-                        const isPinned = cell.column.getIsPinned();
-
-                        // Check if this is the first data column for row expansion indentation
-                        // Skip special columns (expand, select, actions) and apply to first content column
-                        const firstDataColumnIndex = visibleCells.findIndex(
-                          (c) =>
-                            c.column.id !== "expand" &&
-                            c.column.id !== "select" &&
-                            c.column.id !== "actions",
-                        );
-                        const isFirstDataColumn =
-                          cellIndex === firstDataColumnIndex;
-
-                        // Calculate indentation based on row depth for hierarchical data
-                        // Use larger multiplier (2.5rem per level) for better visibility
-                        const depthIndentation =
-                          isFirstDataColumn && row.depth > 0
-                            ? `${row.depth * 2.5}rem`
-                            : undefined;
-
-                        return (
-                          <td
-                            key={cell.id}
-                            style={{
-                              width: `${cell.column.getSize()}px`,
-                              // Pinning styles
-                              position: isPinned ? "sticky" : "relative",
-                              left:
-                                isPinned === "left"
-                                  ? `${cell.column.getStart("left")}px`
-                                  : undefined,
-                              right:
-                                isPinned === "right"
-                                  ? `${cell.column.getAfter("right")}px`
-                                  : undefined,
-                              zIndex: isPinned ? 9 : undefined,
-                              // Add indentation based on row depth for hierarchical data
-                              // Only applied to first data column for visual tree structure
-                              paddingLeft: depthIndentation,
-                            }}
-                            onClick={(e) => {
-                              if (onCellClick) {
-                                e.stopPropagation();
-                                onCellClick({
-                                  row: row.original,
-                                  columnId: cell.column.id,
-                                  value: cell.getValue(),
-                                });
-                              }
-                            }}
-                            className={cn(
-                              cellPaddingClasses[density],
-                              densityClasses[density],
-                              cell.column.columnDef.meta?.cellClassName,
-                              "align-middle relative",
-                              "[&:has([role=checkbox])]:pr-0",
-                              // Special handling for expand column to prevent cutoff
-                              cell.column.id === "expand" && "!px-2",
-                              variantClasses[variant],
-                              // Add background to pinned cells to prevent text overlap
-                              isPinned && "bg-background dark:bg-background",
-                              // Left-pinned column shadow (on right edge) using ::before
-                              isPinned === "left" &&
-                                "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-gradient-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
-                              // Right-pinned column shadow (on left edge) using ::after
-                              isPinned === "right" &&
-                                "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-gradient-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
-                            )}
-                          >
-                            {/* Special columns (expand, select, actions) - always render normally */}
-                            {["expand", "select", "actions"].includes(
-                              cell.column.id,
-                            ) ? (
-                              flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )
-                            ) : /* Grouped cell with expand/collapse */
-                            cell.getIsGrouped() ? (
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    row.toggleExpanded();
-                                  }}
-                                  className="inline-flex items-center justify-center h-6 w-6 rounded-sm hover:bg-muted/50 dark:hover:bg-muted/50 transition-colors"
-                                >
-                                  {row.getIsExpanded() ? (
-                                    <span className="text-sm">▼</span>
-                                  ) : (
-                                    <span className="text-sm">▶</span>
-                                  )}
-                                </button>
-                                <span className="font-medium">
-                                  {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  )}
-                                </span>
-                                <span className="text-xs text-muted-foreground dark:text-muted-foreground">
-                                  ({row.subRows.length})
-                                </span>
-                              </div>
-                            ) : cell.getIsAggregated() ? (
-                              /* Aggregated cell */
-                              <div className="font-medium">
-                                {flexRender(
-                                  cell.column.columnDef.aggregatedCell ??
-                                    cell.column.columnDef.cell,
-                                  cell.getContext(),
-                                )}
-                              </div>
-                            ) : cell.getIsPlaceholder() ? null : (
-                              /* Normal cell */
-                              <div className="truncate">
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext(),
-                                )}
-                              </div>
-                            )}
-                          </td>
-                        );
-                      });
-                    })()}
-                  </tr>
-                  {/* Custom expandable content (detail panel) - renders immediately after parent row */}
-                  {row.getIsExpanded() &&
-                    features?.expanding?.renderExpandedRow && (
-                      <tr>
-                        <td
-                          colSpan={row.getAllCells().length}
-                          className={cn(
-                            cellPaddingClasses[density],
-                            "bg-muted/30 dark:bg-muted/10",
-                          )}
-                        >
-                          {features.expanding.renderExpandedRow(row)}
-                        </td>
-                      </tr>
-                    )}
-                </React.Fragment>
+              (features?.virtualization?.enabled ? (
+                <>
+                  {rowVirtualizer.getVirtualItems().length > 0 && (
+                    <tr>
+                      <td
+                        style={{
+                          height: `${rowVirtualizer.getVirtualItems()[0]?.start ?? 0}px`,
+                          border: 0,
+                          padding: 0,
+                        }}
+                        colSpan={visibleColumnCount}
+                      />
+                    </tr>
+                  )}
+                  {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                    const row = table.getRowModel().rows[virtualRow.index];
+                    if (!row) return null;
+                    return renderRow(row);
+                  })}
+                  {rowVirtualizer.getVirtualItems().length > 0 && (
+                    <tr>
+                      <td
+                        style={{
+                          height: `${
+                            rowVirtualizer.getTotalSize() -
+                            (rowVirtualizer.getVirtualItems()[
+                              rowVirtualizer.getVirtualItems().length - 1
+                            ]?.end ?? 0)
+                          }px`,
+                          border: 0,
+                          padding: 0,
+                        }}
+                        colSpan={visibleColumnCount}
+                      />
+                    </tr>
+                  )}
+                </>
+              ) : (
+                table.getRowModel().rows.map((row) => renderRow(row))
               ))}
           </tbody>
 
@@ -1190,10 +1267,10 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                           isPinned && "bg-muted/50 dark:bg-muted/20",
                           // Left-pinned column shadow (on right edge) using ::before
                           isPinned === "left" &&
-                            "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-gradient-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
+                            "before:content-[''] before:absolute before:top-0 before:bottom-0 before:right-0 before:w-[10px] before:translate-x-full before:pointer-events-none before:bg-linear-to-r before:from-black/10 dark:before:from-black/30 before:to-transparent",
                           // Right-pinned column shadow (on left edge) using ::after
                           isPinned === "right" &&
-                            "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-gradient-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
+                            "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-0 after:w-[10px] after:-translate-x-full after:pointer-events-none after:bg-linear-to-l after:from-black/10 dark:after:from-black/30 after:to-transparent",
                         )}
                       >
                         {footer.isPlaceholder

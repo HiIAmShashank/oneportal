@@ -64,7 +64,7 @@ export function FacetedFilter<TData>({
   const metadata = useFaceting(column);
   const filterValue = column.getFilterValue();
   const placeholder =
-    (column.columnDef.meta as any)?.filterPlaceholder ||
+    column.columnDef.meta?.filterPlaceholder ||
     `Filter ${title || column.id}...`;
 
   // Initialize all state hooks unconditionally (Rules of Hooks)
@@ -85,6 +85,15 @@ export function FacetedFilter<TData>({
       : "",
   );
 
+  // Debounce helper
+  const [inputValue, setInputValue] = React.useState(
+    (filterValue as string) ?? "",
+  );
+
+  React.useEffect(() => {
+    setInputValue((filterValue as string) ?? "");
+  }, [filterValue]);
+
   // Text filter
   if (metadata.variant === "text") {
     return (
@@ -100,8 +109,11 @@ export function FacetedFilter<TData>({
         <Input
           id={`filter-${column.id}`}
           type="text"
-          value={(filterValue as string) ?? ""}
-          onChange={(e) => column.setFilterValue(e.target.value || undefined)}
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            column.setFilterValue(e.target.value || undefined);
+          }}
           placeholder={placeholder}
           className={cn(
             filterHeight,
@@ -558,8 +570,11 @@ export function FacetedFilter<TData>({
       <Input
         id={`filter-${column.id}`}
         type="text"
-        value={(filterValue as string) ?? ""}
-        onChange={(e) => column.setFilterValue(e.target.value || undefined)}
+        value={inputValue}
+        onChange={(e) => {
+          setInputValue(e.target.value);
+          column.setFilterValue(e.target.value || undefined);
+        }}
         placeholder={placeholder}
         className={cn(
           filterHeight,

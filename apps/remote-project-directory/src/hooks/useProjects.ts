@@ -4,7 +4,7 @@ import { acquireToken } from "@one-portal/auth/utils/acquireToken";
 import { fetchProjects } from "../api/client";
 import { type GetProjectsRequest } from "../api/types";
 import { useUserContext } from "../contexts/UserContext";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 const PROJECTS_PAGE_SIZE = 50; // Fetch 50 items per batch
 
@@ -58,7 +58,10 @@ export function useProjects() {
   });
 
   // Flatten projects from all pages
-  const projects = data?.pages.flatMap((page) => page.projects) || [];
+  const projects = useMemo(
+    () => data?.pages.flatMap((page) => page.projects) || [],
+    [data?.pages],
+  );
 
   const updateFilters = useCallback(
     (newFilters: Partial<GetProjectsRequest>) => {
