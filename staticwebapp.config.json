@@ -5,10 +5,18 @@
       "/assets/*",
       "/domino/assets/*",
       "/oneportal-admin/assets/*",
+      "/project-directory/assets/*",
       "/*.{js,mjs,css,json,map,woff,woff2,ttf,otf,svg,webp,ico,wasm}"
     ]
   },
   "routes": [
+    {
+      "route": "/project-directory/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+
     {
       "route": "/assets/*",
       "headers": {
@@ -32,6 +40,12 @@
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable",
         "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "route": "/project-directory/index.html",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate"
       }
     },
     {
