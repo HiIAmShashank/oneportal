@@ -20,6 +20,9 @@ export const Route = createRootRoute({
       scopes: getAuthConfig().scopes,
       skipRedirectOnPreload: true, // Prevents redirects during lazy-loading
       onUnauthenticated: (returnUrl: string) => {
+        // Redirect to sign-in route
+        // - Embedded: Redirects to Shell's sign-in page (/sign-in)
+        // - Standalone: Redirects to local sign-in route (/sign-in)
         const signInUrl = `/sign-in?returnUrl=${encodeURIComponent(returnUrl)}`;
         safeRedirect(signInUrl, "/sign-in");
       },

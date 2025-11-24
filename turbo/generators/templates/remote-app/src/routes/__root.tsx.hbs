@@ -1,23 +1,27 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { createProtectedRouteGuard } from '@one-portal/auth/guards';
-import { safeRedirect } from '@one-portal/auth/utils';
+import { safeRedirect, isEmbeddedMode } from '@one-portal/auth/utils';
 import { msalInstance, getAuthConfig } from '../auth/msalInstance';
 import { AppLayout } from '../components/AppLayout';
+import { ThemeProvider } from '../components/ThemeProvider';
 import { PUBLIC_ROUTES } from '../config/routes';
 
 export const Route = createRootRoute({
   beforeLoad: async ({ location, preload }) => {
     // Skip authentication for public routes
-    if (PUBLIC_ROUTES.includes(location.pathname as any)) {
+    if ((PUBLIC_ROUTES as readonly string[]).includes(location.pathname)) {
       return;
     }
 
-    // Create route guard configuration
+    // Create route guard configuration based on mode
     // SECURITY: Always enforce authentication in both embedded and standalone modes
     const guard = createProtectedRouteGuard(msalInstance, {
       scopes: getAuthConfig().scopes,
       skipRedirectOnPreload: true, // Prevents redirects during lazy-loading
       onUnauthenticated: (returnUrl: string) => {
+        // Redirect to sign-in route
+        // - Embedded: Redirects to Shell's sign-in page (/sign-in)
+        // - Standalone: Redirects to local sign-in route (/sign-in)
         const signInUrl = `/sign-in?returnUrl=${encodeURIComponent(returnUrl)}`;
         safeRedirect(signInUrl, '/sign-in');
       },
@@ -31,11 +35,26 @@ export const Route = createRootRoute({
 
   component: () => {
     const { pathname } = window.location;
-    const isPublicRoute = PUBLIC_ROUTES.includes(pathname as any);
+    const isPublicRoute = (PUBLIC_ROUTES as readonly string[]).includes(pathname);
+    const isStandalone = !isEmbeddedMode({
+      mode: import.meta.env.VITE_APP_MODE as 'auto' | 'standalone' | 'embedded',
+    });
 
     // Don't render AppLayout on public routes
     if (isPublicRoute) {
       return <Outlet />;
+    }
+
+    // In standalone mode, provide our own ThemeProvider
+    // In embedded mode, Shell provides the ThemeProvider
+    if (isStandalone) {
+      return (
+        <ThemeProvider defaultTheme="system" storageKey="one-portal-ui-theme">
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        </ThemeProvider>
+      );
     }
 
     return (

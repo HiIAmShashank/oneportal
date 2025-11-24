@@ -15,11 +15,15 @@ export const Route = createRootRoute({
     if ((PUBLIC_ROUTES as readonly string[]).includes(location.pathname)) {
       return;
     }
+
     // First, ensure user is authenticated
     const guard = createProtectedRouteGuard(msalInstance, {
       scopes: getAuthConfig().scopes,
       skipRedirectOnPreload: true,
       onUnauthenticated: (returnUrl: string) => {
+        // Redirect to sign-in route
+        // - Embedded: Redirects to Shell's sign-in page (/sign-in)
+        // - Standalone: Redirects to local sign-in route (/sign-in)
         const signInUrl = `/sign-in?returnUrl=${encodeURIComponent(returnUrl)}`;
         safeRedirect(signInUrl, "/sign-in");
       },

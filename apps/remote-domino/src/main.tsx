@@ -4,6 +4,8 @@ import { UnifiedAuthProvider } from "@one-portal/auth";
 import { msalInstance, getAuthConfig } from "./auth/msalInstance";
 import { PUBLIC_ROUTES } from "./config/routes";
 import { ThemedSonner } from "./components/ThemedSonner";
+import { ThemeProvider } from "./components/ThemeProvider";
+import { isEmbeddedMode } from "@one-portal/auth/utils";
 import App from "./App";
 import "./app.css";
 import "./style.css";
@@ -22,6 +24,10 @@ if (!container) {
 
 const root = createRoot(container);
 
+const isStandalone = !isEmbeddedMode({
+  mode: import.meta.env.VITE_APP_MODE as "auto" | "standalone" | "embedded",
+});
+
 root.render(
   <StrictMode>
     <UnifiedAuthProvider
@@ -32,8 +38,14 @@ root.render(
       debug={import.meta.env.DEV}
       publicRoutes={PUBLIC_ROUTES}
     >
-      <App />
+      {isStandalone ? (
+        <ThemeProvider defaultTheme="system" storageKey="one-portal-ui-theme">
+          <App />
+          <ThemedSonner />
+        </ThemeProvider>
+      ) : (
+        <App />
+      )}
     </UnifiedAuthProvider>
-    <ThemedSonner />
   </StrictMode>,
 );

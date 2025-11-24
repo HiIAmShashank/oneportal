@@ -4,6 +4,7 @@ import { UnifiedAuthProvider } from "@one-portal/auth";
 import { Sonner } from "@one-portal/ui";
 import { msalInstance, getAuthConfig } from "./auth/msalInstance";
 import { PUBLIC_ROUTES } from "./config/routes";
+import { isEmbeddedMode } from "@one-portal/auth/utils";
 import App from "./App";
 import "./app.css";
 import "./style.css";
@@ -28,6 +29,14 @@ if (!container) {
 
 const root = createRoot(container);
 
+const isStandalone = !isEmbeddedMode({
+  mode: import.meta.env.VITE_APP_MODE as "auto" | "standalone" | "embedded",
+});
+
+// Note: Project Directory currently uses Sonner directly instead of ThemedSonner
+// and does not have ThemeProvider integrated yet.
+// This will be standardized in a future update.
+
 root.render(
   <StrictMode>
     <UnifiedAuthProvider
@@ -38,8 +47,14 @@ root.render(
       debug={import.meta.env.DEV}
       publicRoutes={PUBLIC_ROUTES}
     >
-      <App />
+      {isStandalone ? (
+        <>
+          <App />
+          <Sonner />
+        </>
+      ) : (
+        <App />
+      )}
     </UnifiedAuthProvider>
-    <Sonner />
   </StrictMode>,
 );
