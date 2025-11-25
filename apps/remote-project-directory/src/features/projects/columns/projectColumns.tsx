@@ -2,6 +2,9 @@ import { type ColumnDef } from "@one-portal/ui/data-table-v2";
 import { type Project } from "../../../api/types";
 import { Badge } from "@one-portal/ui";
 import { FavoriteButton } from "../components/FavoriteButton";
+import { CopyableCell } from "../components/CopyableCell";
+import { LinkCell } from "../components/LinkCell";
+import { SharePointIcon } from "../components/SharePointIcon";
 
 // Helper to format currency
 const formatCurrency = (amount?: number, currency = "GBP") => {
@@ -45,26 +48,31 @@ export const projectColumns: ColumnDef<Project>[] = [
   {
     accessorKey: "projectNumber",
     header: "Project Number",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "projectName",
     header: "Project Name",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "clientName",
     header: "Client",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "clientNumber",
     header: "Client Number",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "projectManager",
     header: "Project Manager",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
@@ -73,9 +81,14 @@ export const projectColumns: ColumnDef<Project>[] = [
     cell: ({ getValue }) => {
       const status = getValue() as string;
       return (
-        <Badge variant={status === "Active" ? "default" : "secondary"}>
-          {status}
-        </Badge>
+        <CopyableCell
+          value={status}
+          displayValue={
+            <Badge variant={status === "Active" ? "default" : "secondary"}>
+              {status}
+            </Badge>
+          }
+        />
       );
     },
     meta: {
@@ -89,111 +102,148 @@ export const projectColumns: ColumnDef<Project>[] = [
   {
     accessorKey: "expectedEndDate",
     header: "End Date",
-    cell: ({ getValue }) => formatDate(getValue() as string),
+    cell: ({ getValue }) => (
+      <CopyableCell value={formatDate(getValue() as string)} />
+    ),
     meta: { filterVariant: "date" },
   },
   // --- Extended Columns ---
   {
+    accessorKey: "projectSharepointSite_url",
+    header: "SharePoint Site",
+    cell: ({ getValue }) => (
+      <LinkCell
+        url={getValue() as string}
+        label="Open Site"
+        icon={SharePointIcon}
+      />
+    ),
+    meta: { filterVariant: "text" },
+  },
+  {
     accessorKey: "description",
     header: "Description",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "accountLeader",
     header: "Account Leader",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "projectPrincipal",
     header: "Project Principal",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "project_Director",
     header: "Project Director",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "startDate",
     header: "Start Date",
-    cell: ({ getValue }) => formatDate(getValue() as string),
+    cell: ({ getValue }) => (
+      <CopyableCell value={formatDate(getValue() as string)} />
+    ),
     meta: { filterVariant: "date" },
   },
   {
     accessorKey: "actualEndDate",
     header: "Actual End Date",
-    cell: ({ getValue }) => formatDate(getValue() as string),
+    cell: ({ getValue }) => (
+      <CopyableCell value={formatDate(getValue() as string)} />
+    ),
     meta: { filterVariant: "date" },
   },
   {
     accessorKey: "projectType",
     header: "Project Type",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "contractType",
     header: "Contract Type",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "mainOrSubProject",
     header: "Main/Sub",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "projectOpenOrClosed",
     header: "Open/Closed",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "select" },
   },
   {
     accessorKey: "wonOrLost",
     header: "Won/Lost",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "select" },
   },
   {
     accessorKey: "approvalState",
     header: "Approval State",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "unitCode",
     header: "Unit Code",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "divisionCode",
     header: "Division Code",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "regionCode",
     header: "Region Code",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "countryName",
     header: "Country",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "baseCurrencyCode",
     header: "Currency",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "grossFeeAtCAAP_GBP",
     header: "Gross Fee (GBP)",
-    cell: ({ getValue }) => formatCurrency(getValue() as number),
+    cell: ({ getValue }) => (
+      <CopyableCell value={formatCurrency(getValue() as number)} />
+    ),
     meta: { filterVariant: "number" },
   },
   {
     accessorKey: "portfolioCode",
     header: "Portfolio Code",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "parentProjectName",
     header: "Parent Project",
+    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
     meta: { filterVariant: "text" },
   },
 ];
