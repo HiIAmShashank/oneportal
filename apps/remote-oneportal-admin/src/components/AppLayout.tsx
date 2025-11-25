@@ -1,5 +1,11 @@
 import * as React from "react";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@one-portal/ui";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+  cn,
+} from "@one-portal/ui";
+import { isEmbeddedMode } from "@one-portal/auth/utils";
 import { AppSidebar } from "./AppSidebar";
 import { AppBreadcrumb } from "./AppBreadcrumb";
 
@@ -14,11 +20,16 @@ import { AppBreadcrumb } from "./AppBreadcrumb";
  * - Contained layout for micro-frontend (doesn't overlap shell)
  */
 export function AppLayout({ children }: { children: React.ReactNode }) {
+  // Default to 'auto' detection which checks for /apps/ prefix
+  // This works for both explicit config and auto-detection
+  const isEmbedded = isEmbeddedMode();
+  const heightClass = isEmbedded ? "h-[calc(100vh-70px)]" : "h-screen";
+
   return (
-    <div className="relative min-h-[calc(100vh-70px)] w-full overflow-hidden">
-      <SidebarProvider>
+    <div className={cn("relative w-full overflow-hidden", heightClass)}>
+      <SidebarProvider className="min-h-0 h-full">
         <AppSidebar />
-        <SidebarInset>
+        <SidebarInset className="min-h-0 h-full">
           <header className="border-b border-b-muted shadow-xs flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4">
               <SidebarTrigger className="-ml-1" />
@@ -27,7 +38,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </header>
-          <div className="flex flex-1 flex-col max-h-[calc(100vh-70px)] overflow-auto">
+          <div className="flex flex-1 flex-col overflow-auto min-w-0">
             {children}
           </div>
         </SidebarInset>
