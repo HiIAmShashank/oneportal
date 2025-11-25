@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import {
   ChevronDownIcon,
@@ -11,7 +13,7 @@ import {
 } from "react-day-picker";
 
 import { cn } from "../../lib/utils";
-import { Button, buttonVariants } from "./button";
+import { Button, buttonVariants } from "../../components/ui/button";
 
 function Calendar({
   className,
@@ -43,7 +45,7 @@ function Calendar({
         ...formatters,
       }}
       classNames={{
-        root: cn("w-[250px]", defaultClassNames.root),
+        root: cn("w-fit", defaultClassNames.root),
         months: cn(
           "relative flex flex-col gap-4 md:flex-row",
           defaultClassNames.months,
