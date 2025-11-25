@@ -66,17 +66,17 @@ export interface Project {
 
 export interface GetProjectsRequest {
   UserId: number;
-  Title?: string;
+  ProjectName?: string;
   Description?: string;
-  ProjectCode?: number;
-  ProjectDirector?: string;
-  ProjectManager?: string;
-  ProjectStatus?: string;
-  Region?: string;
-  Unit?: string;
-  Division?: string;
-  ProjectStartDate?: string;
-  ProjectEndDate?: string;
+  ProjectNumber?: string;
+  Project_Director?: string;
+  ProjectPrincipal?: string;
+  ProjectOpenOrClosed?: string;
+  RegionCode?: string;
+  UnitCode?: string;
+  DivisionCode?: string;
+  StartDate?: string;
+  ActualEndDate?: string;
   LimitCount: number;
   LastId?: number | null;
 }

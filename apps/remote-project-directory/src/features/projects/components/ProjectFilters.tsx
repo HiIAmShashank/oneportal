@@ -9,10 +9,10 @@ import {
 } from "@one-portal/ui";
 import { Badge } from "@one-portal/ui";
 import { Combobox } from "../../../components/ui/combobox";
-import { DateRangePicker } from "../../../components/ui/date-range-picker";
+import { DatePicker } from "../../../components/ui/date-picker";
 import { type GetProjectsRequest } from "../../../api/types";
 import { SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
-import { format, type DateRange } from "@one-portal/ui";
+import { format } from "@one-portal/ui";
 
 interface ProjectFiltersProps {
   onFilter: (filters: Partial<GetProjectsRequest>) => void;
@@ -21,7 +21,6 @@ interface ProjectFiltersProps {
 export function ProjectFilters({ onFilter }: ProjectFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState<Partial<GetProjectsRequest>>({});
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   // Calculate active filters count
   const activeFiltersCount = Object.keys(filters).filter(
@@ -34,15 +33,21 @@ export function ProjectFilters({ onFilter }: ProjectFiltersProps) {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleDateChange = (range: DateRange | undefined) => {
-    setDateRange(range);
-    setFilters((prev) => ({
-      ...prev,
-      ProjectStartDate: range?.from
-        ? format(range.from, "yyyy-MM-dd")
-        : undefined,
-      ProjectEndDate: range?.to ? format(range.to, "yyyy-MM-dd") : undefined,
-    }));
+  const handleDateChange = (
+    key: "StartDate" | "ActualEndDate",
+    date: Date | undefined,
+  ) => {
+    const formattedDate = date ? format(date, "yyyy-MM-dd") : "";
+    handleInputChange(key, formattedDate);
+  };
+
+  const parseDate = (dateStr: string | undefined) => {
+    if (!dateStr) return undefined;
+    const [year, month, day] = dateStr.split("-").map(Number);
+    if (year === undefined || month === undefined || day === undefined) {
+      return undefined;
+    }
+    return new Date(year, month - 1, day);
   };
 
   const handleApply = () => {
@@ -51,10 +56,8 @@ export function ProjectFilters({ onFilter }: ProjectFiltersProps) {
 
   const handleReset = () => {
     setFilters({});
-    setDateRange(undefined);
     onFilter({});
   };
-
   // Placeholder data for dropdowns
   const regionOptions = [
     { value: "NA", label: "North America" },
@@ -107,12 +110,14 @@ export function ProjectFilters({ onFilter }: ProjectFiltersProps) {
           <div className="p-4 grid gap-2 md:grid-cols-2 lg:grid-cols-4">
             {/* Text Inputs */}
             <div className="space-y-2">
-              <Label htmlFor="title">Project Title</Label>
+              <Label htmlFor="projectName">Project Name</Label>
               <Input
-                id="title"
-                placeholder="Search by title..."
-                value={filters.Title || ""}
-                onChange={(e) => handleInputChange("Title", e.target.value)}
+                id="projectName"
+                placeholder="Search by name..."
+                value={filters.ProjectName || ""}
+                onChange={(e) =>
+                  handleInputChange("ProjectName", e.target.value)
+                }
               />
             </div>
             <div className="space-y-2">
@@ -127,76 +132,72 @@ export function ProjectFilters({ onFilter }: ProjectFiltersProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="projectCode">Project Code</Label>
+              <Label htmlFor="projectNumber">Project Number</Label>
               <Input
-                id="projectCode"
-                placeholder="Enter code..."
-                value={filters.ProjectCode?.toString() || ""}
+                id="projectNumber"
+                placeholder="Enter number..."
+                value={filters.ProjectNumber || ""}
                 onChange={(e) =>
-                  handleInputChange("ProjectCode", e.target.value)
+                  handleInputChange("ProjectNumber", e.target.value)
                 }
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="projectManager">Project Manager</Label>
+              <Label htmlFor="projectOpenOrClosed">Status</Label>
               <Input
-                id="projectManager"
-                placeholder="Search manager..."
-                value={filters.ProjectManager || ""}
+                id="projectOpenOrClosed"
+                placeholder="Enter status (Open/Closed)..."
+                value={filters.ProjectOpenOrClosed || ""}
                 onChange={(e) =>
-                  handleInputChange("ProjectManager", e.target.value)
+                  handleInputChange("ProjectOpenOrClosed", e.target.value)
                 }
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="projectStatus">Status</Label>
+              <Label htmlFor="divisionCode">Division Code</Label>
               <Input
-                id="projectStatus"
-                placeholder="Enter status..."
-                value={filters.ProjectStatus || ""}
+                id="divisionCode"
+                placeholder="Enter division code..."
+                value={filters.DivisionCode || ""}
                 onChange={(e) =>
-                  handleInputChange("ProjectStatus", e.target.value)
+                  handleInputChange("DivisionCode", e.target.value)
                 }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="division">Division</Label>
-              <Input
-                id="division"
-                placeholder="Enter division..."
-                value={filters.Division || ""}
-                onChange={(e) => handleInputChange("Division", e.target.value)}
               />
             </div>
 
             {/* Comboboxes */}
             <div className="space-y-2">
-              <Label>Region</Label>
+              <Label>Region Code</Label>
               <Combobox
                 options={regionOptions}
-                value={filters.Region}
-                onValueChange={(val) => handleInputChange("Region", val)}
+                value={filters.RegionCode}
+                onValueChange={(val) => handleInputChange("RegionCode", val)}
                 placeholder="Select region..."
               />
             </div>
             <div className="space-y-2">
-              <Label>Unit</Label>
+              <Label>Unit Code</Label>
               <Combobox
                 options={unitOptions}
-                value={filters.Unit}
-                onValueChange={(val) => handleInputChange("Unit", val)}
+                value={filters.UnitCode}
+                onValueChange={(val) => handleInputChange("UnitCode", val)}
                 placeholder="Select unit..."
               />
             </div>
 
-            {/* Date Range - Spans 2 cols on large screens if needed, or just 1 */}
-            <div className="space-y-2 lg:col-span-2">
-              <Label>Project Duration</Label>
-              <DateRangePicker
-                date={dateRange}
-                onDateChange={handleDateChange}
-              />
-            </div>
+            {/* Date Filters */}
+            <DatePicker
+              label="Start From"
+              id="startDate"
+              date={parseDate(filters.StartDate)}
+              setDate={(date) => handleDateChange("StartDate", date)}
+            />
+            <DatePicker
+              label="End By"
+              id="actualEndDate"
+              date={parseDate(filters.ActualEndDate)}
+              setDate={(date) => handleDateChange("ActualEndDate", date)}
+            />
           </div>
           <div className="flex items-center justify-end gap-2 p-4 pt-0">
             <Button variant="outline" onClick={handleReset}>

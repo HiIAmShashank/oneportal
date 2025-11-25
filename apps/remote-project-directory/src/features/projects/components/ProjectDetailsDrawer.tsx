@@ -7,6 +7,9 @@ import {
   Separator,
 } from "@one-portal/ui";
 import { type Project } from "../../../api/types";
+import { CopyableCell } from "./CopyableCell";
+import { LinkCell } from "./LinkCell";
+import { SharePointIcon } from "./SharePointIcon";
 
 interface ProjectDetailsDrawerProps {
   project: Project | null;
@@ -18,18 +21,28 @@ const DetailItem = ({
   label,
   value,
   fullWidth = false,
+  children,
 }: {
   label: string;
-  value: string | number | undefined | null;
+  value?: string | number | undefined | null;
   fullWidth?: boolean;
+  children?: React.ReactNode;
 }) => {
-  if (value === undefined || value === null || value === "") return null;
+  const hasValue = value !== undefined && value !== null && value !== "";
+  if (!hasValue && !children) return null;
+
   return (
     <div className={`flex flex-col space-y-1 ${fullWidth ? "col-span-2" : ""}`}>
       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
         {label}
       </span>
-      <span className="text-sm font-medium text-foreground">{value}</span>
+      <div className="text-sm font-medium text-foreground">
+        {children ? (
+          children
+        ) : (
+          <CopyableCell value={value} className="w-full" />
+        )}
+      </div>
     </div>
   );
 };
@@ -212,11 +225,13 @@ export function ProjectDetailsDrawer({
               />
               <DetailItem label="Portfolio" value={project.portfolioCode} />
               <DetailItem label="Source" value={project.sourceSystem} />
-              <DetailItem
-                label="SharePoint"
-                value={project.projectSharepointSite_url}
-                fullWidth
-              />
+              <DetailItem label="SharePoint" fullWidth>
+                <LinkCell
+                  url={project.projectSharepointSite_url}
+                  label="Open Site"
+                  icon={SharePointIcon}
+                />
+              </DetailItem>
             </DetailSection>
           </div>
         </div>

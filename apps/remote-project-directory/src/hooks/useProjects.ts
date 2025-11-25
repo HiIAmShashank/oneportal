@@ -65,7 +65,7 @@ export function useProjects() {
 
   const updateFilters = useCallback(
     (newFilters: Partial<GetProjectsRequest>) => {
-      setFilters((prev) => ({ ...prev, ...newFilters }));
+      setFilters(newFilters);
     },
     [],
   );

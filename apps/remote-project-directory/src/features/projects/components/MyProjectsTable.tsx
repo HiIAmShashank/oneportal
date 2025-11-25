@@ -92,6 +92,14 @@ export function MyProjectsTable({ projects }: MyProjectsTableProps) {
     [],
   );
 
+  const persistence = useMemo(
+    () => ({
+      enabled: true,
+      key: "remote-project-directory-my-projects-table",
+    }),
+    [],
+  );
+
   const ui = useMemo(
     () => ({
       showToolbar: true,
@@ -116,6 +124,7 @@ export function MyProjectsTable({ projects }: MyProjectsTableProps) {
         data={projects}
         columns={projectColumns}
         features={features}
+        persistence={persistence}
         ui={ui}
         state={tableState}
         onRowClick={handleRowClick}
