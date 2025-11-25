@@ -185,7 +185,10 @@ export function FacetedFilter<TData>({
               className={cn(
                 filterHeight,
                 filterTextSize,
-                "w-full justify-between font-thin text-muted-foreground",
+                "w-full justify-between font-normal",
+                selected.length > 0
+                  ? "text-foreground"
+                  : "text-muted-foreground",
               )}
             >
               <span className="truncate">
@@ -347,7 +350,7 @@ export function FacetedFilter<TData>({
           >
             <SelectValue
               placeholder="All"
-              className="font-thin text-muted-foreground"
+              className="font-normal text-muted-foreground"
             />
           </SelectTrigger>
           <SelectContent>
@@ -540,7 +543,7 @@ export function FacetedFilter<TData>({
           >
             <SelectValue
               placeholder={`All ${title || column.id}`}
-              className="font-thin text-muted-foreground"
+              className="font-normal text-muted-foreground"
             />
           </SelectTrigger>
           <SelectContent>

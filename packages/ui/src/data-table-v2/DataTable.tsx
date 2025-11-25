@@ -909,7 +909,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                           cellPaddingClasses[density],
                           header.column.columnDef.meta?.headerClassName,
                           "text-left align-middle font-bold",
-                          "text-muted-foreground dark:text-muted-foreground",
+                          "text-foreground dark:text-foreground",
                           "[&:has([role=checkbox])]:pr-0",
                           "relative",
                           // Column separator border (only for non-pinned columns)
@@ -1294,7 +1294,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                         className={cn(
                           cellPaddingClasses[density],
                           "text-left align-middle relative",
-                          "text-muted-foreground dark:text-muted-foreground",
+                          "text-foreground dark:text-foreground",
                           variantClasses[variant],
                           isPinned && "bg-muted/50 dark:bg-muted/20",
                           // Left-pinned column shadow (on right edge) using ::before
