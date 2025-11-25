@@ -152,6 +152,14 @@ export function ProjectsTable() {
     [totalCount, pagination.pageSize, columnFilters.length, globalFilter],
   );
 
+  const persistence = useMemo(
+    () => ({
+      enabled: true,
+      key: "remote-project-directory-projects-table",
+    }),
+    [],
+  );
+
   // Memoize UI config
   const ui = useMemo(
     () => ({
@@ -190,6 +198,7 @@ export function ProjectsTable() {
         error={error ? (error as Error) : null}
         state={tableState}
         features={features}
+        persistence={persistence}
         ui={ui}
         onRowClick={handleRowClick}
       />
