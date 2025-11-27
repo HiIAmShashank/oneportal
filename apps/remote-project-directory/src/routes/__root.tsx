@@ -5,12 +5,13 @@ import { msalInstance, getAuthConfig } from "../auth/msalInstance";
 import { AppLayout } from "../components/AppLayout";
 import { PUBLIC_ROUTES } from "../config/routes";
 import { NotFound } from "../components/NotFound";
+import { GraphPhotoProvider } from "../contexts/GraphPhotoContext";
 
 export const Route = createRootRoute({
   notFoundComponent: NotFound,
   beforeLoad: async ({ location, preload }) => {
     // Skip authentication for public routes
-    if (PUBLIC_ROUTES.includes(location.pathname as any)) {
+    if ((PUBLIC_ROUTES as readonly string[]).includes(location.pathname)) {
       return;
     }
 
@@ -36,7 +37,9 @@ export const Route = createRootRoute({
 
   component: () => {
     const { pathname } = window.location;
-    const isPublicRoute = PUBLIC_ROUTES.includes(pathname as any);
+    const isPublicRoute = (PUBLIC_ROUTES as readonly string[]).includes(
+      pathname,
+    );
 
     // Don't render AppLayout on public routes
     if (isPublicRoute) {
@@ -44,9 +47,11 @@ export const Route = createRootRoute({
     }
 
     return (
-      <AppLayout>
-        <Outlet />
-      </AppLayout>
+      <GraphPhotoProvider>
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
+      </GraphPhotoProvider>
     );
   },
 });

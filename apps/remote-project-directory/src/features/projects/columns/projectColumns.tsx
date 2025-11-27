@@ -5,6 +5,7 @@ import { FavoriteButton } from "../components/FavoriteButton";
 import { CopyableCell } from "../components/CopyableCell";
 import { LinkCell } from "../components/LinkCell";
 import { SharePointIcon } from "../components/SharePointIcon";
+import { UserAvatar } from "../../../components/UserAvatar";
 
 // Helper to format currency
 const formatCurrency = (amount?: number, currency = "GBP") => {
@@ -72,7 +73,13 @@ export const projectColumns: ColumnDef<Project>[] = [
   {
     accessorKey: "projectManager",
     header: "Project Manager",
-    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
+    cell: ({ row, getValue }) => (
+      <UserAvatar
+        name={getValue() as string}
+        email={row.original.projectManagerEmail}
+        showName
+      />
+    ),
     meta: { filterVariant: "text" },
   },
   {
@@ -129,13 +136,25 @@ export const projectColumns: ColumnDef<Project>[] = [
   {
     accessorKey: "accountLeader",
     header: "Account Leader",
-    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
+    cell: ({ row, getValue }) => (
+      <UserAvatar
+        name={getValue() as string}
+        email={row.original.accountLeaderEmail}
+        showName
+      />
+    ),
     meta: { filterVariant: "text" },
   },
   {
     accessorKey: "projectPrincipal",
     header: "Project Principal",
-    cell: ({ getValue }) => <CopyableCell value={getValue() as string} />,
+    cell: ({ row, getValue }) => (
+      <UserAvatar
+        name={getValue() as string}
+        email={row.original.projectPrincipalEmail}
+        showName
+      />
+    ),
     meta: { filterVariant: "text" },
   },
   {
