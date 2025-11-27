@@ -13,6 +13,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@microsoft/microsoft-graph-types": "^2.43.1",
     "@one-portal/auth": "workspace:*",
     "@one-portal/config": "workspace:*",
     "@one-portal/ui": "workspace:*",

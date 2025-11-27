@@ -10,6 +10,7 @@ import { type Project } from "../../../api/types";
 import { CopyableCell } from "./CopyableCell";
 import { LinkCell } from "./LinkCell";
 import { SharePointIcon } from "./SharePointIcon";
+import { UserAvatar } from "../../../components/UserAvatar";
 
 interface ProjectDetailsDrawerProps {
   project: Project | null;
@@ -47,6 +48,45 @@ const DetailItem = ({
   );
 };
 
+const PersonDetail = ({
+  name,
+  email,
+  groupNumber,
+}: {
+  name?: string;
+  email?: string;
+  groupNumber?: string;
+}) => {
+  if (!name) return <span className="text-muted-foreground">-</span>;
+
+  return (
+    <div className="flex items-start gap-3 pt-1">
+      <UserAvatar name={name} email={email} className="mt-0.5" />
+      <div className="flex flex-col min-w-0 overflow-hidden">
+        <div
+          className="font-medium text-sm truncate leading-none mb-1"
+          title={name}
+        >
+          {name}
+        </div>
+        {email && (
+          <div
+            className="text-xs text-muted-foreground truncate leading-tight"
+            title={email}
+          >
+            {email}
+          </div>
+        )}
+        {groupNumber && (
+          <div className="text-xs text-muted-foreground/80 truncate mt-0.5">
+            Group: {groupNumber}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const DetailSection = ({
   title,
   children,
@@ -59,7 +99,7 @@ const DetailSection = ({
       {title}
       <Separator className="flex-1" />
     </h4>
-    <div className="grid grid-cols-2 gap-4">{children}</div>
+    <div className="grid grid-cols-2 gap-x-4 gap-y-6">{children}</div>
   </div>
 );
 
@@ -90,13 +130,13 @@ export function ProjectDetailsDrawer({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-xl p-0 flex flex-col gap-0">
-        <SheetHeader className="p-6 pb-4 border-b">
+        <SheetHeader className="p-4 border-b">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <SheetTitle className="text-xl">{project.projectName}</SheetTitle>
             </div>
           </div>
-          <SheetDescription className="line-clamp-2 mt-2">
+          <SheetDescription className="line-clamp-2">
             {project.description || "No description available."}
           </SheetDescription>
         </SheetHeader>
@@ -107,6 +147,14 @@ export function ProjectDetailsDrawer({
               <DetailItem
                 label="Project Number"
                 value={project.projectNumber}
+              />
+              <DetailItem
+                label="Opportunity Number"
+                value={project.opportunityNumber}
+              />
+              <DetailItem
+                label="MSA Project Number"
+                value={project.masterServiceAgreementProjectNumber}
               />
               <DetailItem label="Status" value={project.projectStatus} />
             </DetailSection>
@@ -132,6 +180,47 @@ export function ProjectDetailsDrawer({
                 label="Country"
                 value={`${project.countryName} (${project.countryISOCode})`}
               />
+            </DetailSection>
+
+            <DetailSection title="Key People">
+              <DetailItem label="Account Leader">
+                <PersonDetail
+                  name={project.accountLeader}
+                  email={project.accountLeaderEmail}
+                  groupNumber={project.accountLeaderGroupNumber}
+                />
+              </DetailItem>
+              <DetailItem label="Project Manager">
+                <PersonDetail
+                  name={project.projectManager}
+                  email={project.projectManagerEmail}
+                  groupNumber={project.projectManagerGroupNumber}
+                />
+              </DetailItem>
+              <DetailItem label="Project Principal">
+                <PersonDetail
+                  name={project.projectPrincipal}
+                  email={project.projectPrincipalEmail}
+                  groupNumber={project.projectPrincipalGroupNumber}
+                />
+              </DetailItem>
+              <DetailItem label="Project Director">
+                <PersonDetail name={project.project_Director} />
+              </DetailItem>
+              <DetailItem label="Safety Advisor">
+                <PersonDetail
+                  name={project.projectSafetyAdivisor}
+                  groupNumber={project.projectSafetyAdivisorGroupNumber}
+                />
+              </DetailItem>
+              <DetailItem label="Sustainability Consultant">
+                <PersonDetail
+                  name={project.projectSustainabilityConsultant}
+                  groupNumber={
+                    project.projectSustainabilityConsultantGroupNumber
+                  }
+                />
+              </DetailItem>
             </DetailSection>
 
             <DetailSection title="Timeline">
@@ -186,33 +275,6 @@ export function ProjectDetailsDrawer({
               />
             </DetailSection>
 
-            <DetailSection title="Key People">
-              <DetailItem
-                label="Project Manager"
-                value={project.projectManager}
-              />
-              <DetailItem
-                label="Account Leader"
-                value={project.accountLeader}
-              />
-              <DetailItem
-                label="Project Principal"
-                value={project.projectPrincipal}
-              />
-              <DetailItem
-                label="Project Director"
-                value={project.project_Director}
-              />
-              <DetailItem
-                label="Safety Advisor"
-                value={project.projectSafetyAdivisor}
-              />
-              <DetailItem
-                label="Sustainability"
-                value={project.projectSustainabilityConsultant}
-              />
-            </DetailSection>
-
             <DetailSection title="Hierarchy & Systems">
               <DetailItem
                 label="Parent Project"
@@ -223,14 +285,20 @@ export function ProjectDetailsDrawer({
                 label="Parent Number"
                 value={project.parentProjectNumber}
               />
+              <DetailItem
+                label="Parent Portfolio"
+                value={project.parentProjectPortfolioCode}
+              />
               <DetailItem label="Portfolio" value={project.portfolioCode} />
               <DetailItem label="Source" value={project.sourceSystem} />
               <DetailItem label="SharePoint" fullWidth>
-                <LinkCell
-                  url={project.projectSharepointSite_url}
-                  label="Open Site"
-                  icon={SharePointIcon}
-                />
+                <div className="flex flex-col gap-2">
+                  <LinkCell
+                    url={project.projectSharepointSite_url}
+                    label="Open Site"
+                    icon={SharePointIcon}
+                  />
+                </div>
               </DetailItem>
             </DetailSection>
           </div>
