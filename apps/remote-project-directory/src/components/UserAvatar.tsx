@@ -13,15 +13,19 @@ function getInitials(name?: string, email?: string): string {
   if (name) {
     const parts = name.trim().split(/\s+/);
     if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      const firstInitial = parts[0]?.[0] || "";
+      const lastInitial = parts[parts.length - 1]?.[0] || "";
+      return (firstInitial + lastInitial).toUpperCase();
     }
     return name.substring(0, 2).toUpperCase();
   }
 
   if (email) {
-    const parts = email.split("@")[0].split(".");
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
+    const parts = email.split("@")[0]?.split(".");
+    if (parts && parts.length >= 2) {
+      const firstInitial = parts[0]?.[0] || "";
+      const lastInitial = parts[1]?.[0] || "";
+      return (firstInitial + lastInitial).toUpperCase();
     }
     return email.substring(0, 2).toUpperCase();
   }
