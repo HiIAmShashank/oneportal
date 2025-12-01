@@ -5,8 +5,9 @@ import {
   type ColumnFiltersState,
 } from "@one-portal/ui";
 import { type Project } from "../../../api/types";
-import { projectColumns } from "../columns/projectColumns";
+import { getProjectColumns } from "../columns/projectColumns";
 import { ProjectDetailsDrawer } from "./ProjectDetailsDrawer";
+import { useOptionSets } from "../../../hooks/useOptionSets";
 
 interface MyProjectsTableProps {
   projects: Project[];
@@ -54,6 +55,9 @@ export function MyProjectsTable({ projects }: MyProjectsTableProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  // Fetch option sets for filters
+  const { data: optionSets } = useOptionSets();
+
   // Handle row click to open drawer
   const handleRowClick = useCallback((row: Project) => {
     setSelectedProject(row);
@@ -64,6 +68,8 @@ export function MyProjectsTable({ projects }: MyProjectsTableProps) {
   const handleDrawerOpenChange = useCallback((open: boolean) => {
     setIsDrawerOpen(open);
   }, []);
+
+  const columns = useMemo(() => getProjectColumns(optionSets), [optionSets]);
 
   const features: FeaturesConfig<Project> = useMemo(
     () => ({
@@ -122,7 +128,7 @@ export function MyProjectsTable({ projects }: MyProjectsTableProps) {
     <div className="space-y-4">
       <DataTable
         data={projects}
-        columns={projectColumns}
+        columns={columns}
         features={features}
         persistence={persistence}
         ui={ui}
