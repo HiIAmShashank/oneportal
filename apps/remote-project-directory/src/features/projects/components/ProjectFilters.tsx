@@ -10,15 +10,19 @@ import {
 import { Badge } from "@one-portal/ui";
 import { Combobox } from "../../../components/ui/combobox";
 import { DatePicker } from "../../../components/ui/date-picker";
-import { type GetProjectsRequest } from "../../../api/types";
+import {
+  type GetProjectsRequest,
+  type OptionSetsResponse,
+} from "../../../api/types";
 import { SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "@one-portal/ui";
 
 interface ProjectFiltersProps {
   onFilter: (filters: Partial<GetProjectsRequest>) => void;
+  optionSets?: OptionSetsResponse;
 }
 
-export function ProjectFilters({ onFilter }: ProjectFiltersProps) {
+export function ProjectFilters({ onFilter, optionSets }: ProjectFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState<Partial<GetProjectsRequest>>({});
 
@@ -58,18 +62,20 @@ export function ProjectFilters({ onFilter }: ProjectFiltersProps) {
     setFilters({});
     onFilter({});
   };
-  // Placeholder data for dropdowns
-  const regionOptions = [
-    { value: "NA", label: "North America" },
-    { value: "EU", label: "Europe" },
-    { value: "APAC", label: "Asia Pacific" },
-  ];
 
-  const unitOptions = [
-    { value: "IT", label: "Information Technology" },
-    { value: "HR", label: "Human Resources" },
-    { value: "FIN", label: "Finance" },
-  ];
+  // Use dynamic options
+  const regionOptions =
+    optionSets?.regionCode.map((code) => ({ label: code, value: code })) || [];
+  const unitOptions =
+    optionSets?.unitCode.map((code) => ({ label: code, value: code })) || [];
+  const divisionOptions =
+    optionSets?.divisionCode.map((code) => ({ label: code, value: code })) ||
+    [];
+  const openClosedOptions =
+    optionSets?.projectOpenOrClosed.map((status) => ({
+      label: status,
+      value: status,
+    })) || [];
 
   return (
     <Collapsible
@@ -142,30 +148,28 @@ export function ProjectFilters({ onFilter }: ProjectFiltersProps) {
                 }
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="projectOpenOrClosed">Status</Label>
-              <Input
-                id="projectOpenOrClosed"
-                placeholder="Enter status (Open/Closed)..."
-                value={filters.ProjectOpenOrClosed || ""}
-                onChange={(e) =>
-                  handleInputChange("ProjectOpenOrClosed", e.target.value)
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="divisionCode">Division Code</Label>
-              <Input
-                id="divisionCode"
-                placeholder="Enter division code..."
-                value={filters.DivisionCode || ""}
-                onChange={(e) =>
-                  handleInputChange("DivisionCode", e.target.value)
-                }
-              />
-            </div>
 
-            {/* Comboboxes */}
+            {/* Dropdowns */}
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Combobox
+                options={openClosedOptions}
+                value={filters.ProjectOpenOrClosed}
+                onValueChange={(val) =>
+                  handleInputChange("ProjectOpenOrClosed", val)
+                }
+                placeholder="Select status..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Division Code</Label>
+              <Combobox
+                options={divisionOptions}
+                value={filters.DivisionCode}
+                onValueChange={(val) => handleInputChange("DivisionCode", val)}
+                placeholder="Select division..."
+              />
+            </div>
             <div className="space-y-2">
               <Label>Region Code</Label>
               <Combobox

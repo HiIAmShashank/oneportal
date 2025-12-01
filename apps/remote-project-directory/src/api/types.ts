@@ -91,3 +91,11 @@ export interface UpdateFavouriteRequest {
   ProjectId: number;
   UpdateType: 0 | 1; // 0 = Add, 1 = Remove
 }
+
+export interface OptionSetsResponse {
+  divisionCode: string[];
+  unitCode: string[];
+  regionCode: string[];
+  projectStatus: string[];
+  projectOpenOrClosed: string[];
+}

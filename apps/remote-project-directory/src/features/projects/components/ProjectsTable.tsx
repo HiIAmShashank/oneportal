@@ -5,10 +5,11 @@ import {
   type FeaturesConfig,
 } from "@one-portal/ui";
 import { useProjects } from "../../../hooks/useProjects";
-import { projectColumns } from "../columns/projectColumns";
+import { getProjectColumns } from "../columns/projectColumns";
 import { ProjectFilters } from "./ProjectFilters";
 import { type Project } from "../../../api/types";
 import { ProjectDetailsDrawer } from "./ProjectDetailsDrawer";
+import { useOptionSets } from "../../../hooks/useOptionSets";
 
 // Default visibility configuration - defined outside component for stability
 const DEFAULT_VISIBILITY = {
@@ -56,6 +57,8 @@ export function ProjectsTable() {
     totalCount,
     setFilters,
   } = useProjects();
+
+  const { data: optionSets } = useOptionSets();
 
   // State for the details drawer
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -112,6 +115,8 @@ export function ProjectsTable() {
     isFetchingNextPage,
     fetchNextPage,
   ]);
+
+  const columns = useMemo(() => getProjectColumns(optionSets), [optionSets]);
 
   // Memoize features config to prevent re-renders
   const features: FeaturesConfig<Project> = useMemo(
@@ -189,11 +194,12 @@ export function ProjectsTable() {
           setFilters(newFilters);
           setPagination((prev) => ({ ...prev, pageIndex: 0 }));
         }}
+        optionSets={optionSets}
       />
 
       <DataTable
         data={projects}
-        columns={projectColumns}
+        columns={columns}
         isLoading={isLoading}
         error={error ? (error as Error) : null}
         state={tableState}

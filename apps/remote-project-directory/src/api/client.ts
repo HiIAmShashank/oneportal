@@ -4,6 +4,7 @@ import {
   type ApiUser,
   type GetProjectsRequest,
   type GetProjectsResponse,
+  type OptionSetsResponse,
 } from "./types";
 
 interface ApiRequestOptions {
@@ -128,4 +129,15 @@ export async function updateFavouriteProject(
     method: "POST",
     body: request,
   });
+}
+
+export async function fetchOptionSets(
+  token: string,
+  username: string,
+): Promise<OptionSetsResponse> {
+  return apiRequest<OptionSetsResponse>(
+    API_ENDPOINTS.OPTION_SETS,
+    token,
+    username,
+  );
 }
