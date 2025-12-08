@@ -12,6 +12,14 @@ import type {
   FetchEventsParams,
   FetchEventTypesParams,
   FetchApplicationsParams,
+  FetchSubscriptionsParams,
+  PaginatedSubscriptionsResponse,
+  PaginatedJobTypesResponse,
+  FetchJobTypesParams,
+  PaginatedWorkflowStepsResponse,
+  FetchWorkflowStepsParams,
+  PaginatedWorkflowStepTypesResponse,
+  FetchWorkflowStepTypesParams,
 } from "./types";
 import {
   API_ENDPOINTS,
@@ -204,6 +212,134 @@ export async function fetchApplications(
 
   return await apiRequest<PaginatedApplicationsResponse>(
     `${API_ENDPOINTS.APPLICATIONS.LIST}${queryString}`,
+    token,
+  );
+}
+
+/**
+ * Fetch subscriptions with optional pagination
+ *
+ * @param token - Access token from MSAL
+ * @param params - Optional pagination parameters
+ * @returns Promise resolving to paginated subscriptions response
+ * @throws ApiError if API call fails
+ *
+ * @example
+ * ```typescript
+ * const token = await acquireToken(['User.Read']);
+ * const subscriptions = await fetchSubscriptions(token, {
+ *   pageNumber: 1,
+ *   pageSize: 10
+ * });
+ * ```
+ */
+export async function fetchSubscriptions(
+  token: string,
+  params?: FetchSubscriptionsParams,
+): Promise<PaginatedSubscriptionsResponse> {
+  const queryString = buildQueryString({
+    pageNumber: params?.pageNumber || 1,
+    pageSize: params?.pageSize || 10,
+  });
+
+  return await apiRequest<PaginatedSubscriptionsResponse>(
+    `${API_ENDPOINTS.SUBSCRIPTIONS.LIST}${queryString}`,
+    token,
+  );
+}
+
+/**
+ * Fetch job types with optional pagination
+ *
+ * @param token - Access token from MSAL
+ * @param params - Optional pagination parameters
+ * @returns Promise resolving to paginated job types response
+ * @throws ApiError if API call fails
+ *
+ * @example
+ * ```typescript
+ * const token = await acquireToken(['User.Read']);
+ * const jobTypes = await fetchJobTypes(token, {
+ *   pageNumber: 1,
+ *   pageSize: 100
+ * });
+ * ```
+ */
+export async function fetchJobTypes(
+  token: string,
+  params?: FetchJobTypesParams,
+): Promise<PaginatedJobTypesResponse> {
+  const queryString = buildQueryString({
+    pageNumber: params?.pageNumber ?? DEFAULT_PAGE_NUMBER,
+    pageSize: params?.pageSize ?? DEFAULT_PAGE_SIZE,
+  });
+
+  return await apiRequest<PaginatedJobTypesResponse>(
+    `${API_ENDPOINTS.JOB_TYPES.LIST}${queryString}`,
+    token,
+  );
+}
+
+/**
+ * Fetch workflow steps with optional pagination
+ *
+ * @param token - Access token from MSAL
+ * @param params - Optional pagination parameters
+ * @returns Promise resolving to paginated workflow steps response
+ * @throws ApiError if API call fails
+ *
+ * @example
+ * ```typescript
+ * const token = await acquireToken(['User.Read']);
+ * const workflowSteps = await fetchWorkflowSteps(token, {
+ *   pageNumber: 1,
+ *   pageSize: 100
+ * });
+ * ```
+ */
+export async function fetchWorkflowSteps(
+  token: string,
+  params?: FetchWorkflowStepsParams,
+): Promise<PaginatedWorkflowStepsResponse> {
+  const queryString = buildQueryString({
+    pageNumber: params?.pageNumber ?? DEFAULT_PAGE_NUMBER,
+    pageSize: params?.pageSize ?? DEFAULT_PAGE_SIZE,
+  });
+
+  return await apiRequest<PaginatedWorkflowStepsResponse>(
+    `${API_ENDPOINTS.WORKFLOW_STEPS.LIST}${queryString}`,
+    token,
+  );
+}
+
+/**
+ * Fetch workflow step types with optional pagination
+ *
+ * @param token - Access token from MSAL
+ * @param params - Optional pagination parameters
+ * @returns Promise resolving to paginated workflow step types response
+ * @throws ApiError if API call fails
+ *
+ * @example
+ * ```typescript
+ * const token = await acquireToken(['User.Read']);
+ * const workflowStepTypes = await fetchWorkflowStepTypes(token, {
+ *   pageNumber: 1,
+ *   pageSize: 100
+ * });
+ * ```
+ */
+export async function fetchWorkflowStepTypes(
+  token: string,
+  params?: FetchWorkflowStepTypesParams,
+): Promise<PaginatedWorkflowStepTypesResponse> {
+  const queryString = buildQueryString({
+    pageNumber: params?.pageNumber ?? DEFAULT_PAGE_NUMBER,
+    pageSize: params?.pageSize ?? DEFAULT_PAGE_SIZE,
+  });
+
+  return await apiRequest<PaginatedWorkflowStepTypesResponse>(
+    `${API_ENDPOINTS.WORKFLOW_STEP_TYPES.LIST}${queryString}`,
     token,
   );
 }
