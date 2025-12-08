@@ -12,6 +12,7 @@ import { useEventTypes } from "../hooks/useEventTypes";
 import { useApplications } from "../hooks/useApplications";
 import { DynamicIcon } from "../components/DynamicIcon";
 import { ArrowRight, TrendingUp } from "lucide-react";
+import { useSubscriptions } from "../hooks/useSubscriptions";
 
 export const Route = createFileRoute("/")({
   component: DashboardPage,
@@ -37,6 +38,12 @@ function DashboardPage() {
     error: applicationsError,
   } = useApplications();
 
+  const {
+    data: subscriptionsData,
+    isLoading: subscriptionsLoading,
+    error: subscriptionsError,
+  } = useSubscriptions();
+
   // Calculate event statistics
   const eventStats = {
     total: eventsData?.totalCount ?? 0,
@@ -46,6 +53,10 @@ function DashboardPage() {
 
   const eventTypeStats = {
     total: eventTypesData?.totalCount ?? 0,
+  };
+
+  const subscriptionsStats = {
+    total: subscriptionsData?.totalCount ?? 0,
   };
 
   const applicationStats = {
@@ -71,7 +82,7 @@ function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Events Card */}
         <Link to="/events" className="group">
           <Card className="border border-white/20 dark:border-white/10 shadow-xl bg-background/40 backdrop-blur-lg hover:bg-background/50 transition-all relative overflow-hidden h-full">
@@ -292,6 +303,50 @@ function DashboardPage() {
                     </div>
                   )}
                 </>
+              )}
+            </CardFooter>
+          </Card>
+        </Link>
+
+        {/* Subscriptions Card */}
+        <Link to="/subscriptions" className="group">
+          <Card className="border border-white/20 dark:border-white/10 shadow-xl bg-background/40 backdrop-blur-lg hover:bg-background/50 transition-all relative overflow-hidden h-full">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-green-500/10 to-transparent rounded-full -mr-16 -mt-16" />
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-green-500/10 text-green-600 dark:text-green-400">
+                    <DynamicIcon name="Key" className="h-6 w-6" />
+                  </div>
+                  <CardDescription className="text-lg font-medium text-muted-foreground">
+                    Subscriptions
+                  </CardDescription>
+                </div>
+                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+              </div>
+              {subscriptionsLoading ? (
+                <Skeleton className="h-12 w-32 mt-4" />
+              ) : subscriptionsError ? (
+                <CardTitle className="text-2xl font-bold text-destructive mt-4">
+                  Error
+                </CardTitle>
+              ) : (
+                <CardTitle className="text-4xl font-bold mt-4 bg-linear-to-br from-foreground to-foreground/70 bg-clip-text">
+                  {subscriptionsStats.total.toLocaleString()}
+                </CardTitle>
+              )}
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-3 pt-0">
+              {subscriptionsLoading ? (
+                <Skeleton className="h-4 w-full" />
+              ) : subscriptionsError ? (
+                <p className="text-xs text-destructive">
+                  Failed to load subscriptions data
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Registered subscription definitions in the system
+                </p>
               )}
             </CardFooter>
           </Card>

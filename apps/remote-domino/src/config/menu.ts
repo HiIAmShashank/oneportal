@@ -35,4 +35,32 @@ export const menuItems: MenuItem[] = [
     order: 4,
     description: "View and manage registered applications",
   },
+  {
+    name: "Subscriptions",
+    path: "/subscriptions",
+    icon: "Key",
+    order: 5,
+    description: "View and manage registered subscriptions",
+  },
+  {
+    name: "Job Types",
+    path: "/job-types",
+    icon: "Briefcase",
+    order: 6,
+    description: "View and manage job type definitions",
+  },
+  {
+    name: "Workflow Steps",
+    path: "/workflow-steps",
+    icon: "Workflow",
+    order: 7,
+    description: "View and manage workflow step definitions",
+  },
+  {
+    name: "Workflow Types",
+    path: "/workflow-step-types",
+    icon: "Network",
+    order: 8,
+    description: "View and manage workflow step type definitions",
+  },
 ];

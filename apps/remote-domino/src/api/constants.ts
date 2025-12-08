@@ -12,6 +12,18 @@ export const API_ENDPOINTS = {
   APPLICATIONS: {
     LIST: "/applications",
   },
+  SUBSCRIPTIONS: {
+    LIST: "/subscriptions",
+  },
+  JOB_TYPES: {
+    LIST: "/jobTypes",
+  },
+  WORKFLOW_STEPS: {
+    LIST: "/workflowTypes/false",
+  },
+  WORKFLOW_STEP_TYPES: {
+    LIST: "/workflowStepTypes/false",
+  },
 } as const;
 
 /**

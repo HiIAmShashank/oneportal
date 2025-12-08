@@ -9,22 +9,46 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root";
+import { Route as WorkflowStepsRouteImport } from "./routes/workflow-steps";
+import { Route as WorkflowStepTypesRouteImport } from "./routes/workflow-step-types";
 import { Route as UnauthorizedRouteImport } from "./routes/unauthorized";
+import { Route as SubscriptionsRouteImport } from "./routes/subscriptions";
 import { Route as SignInRouteImport } from "./routes/sign-in";
+import { Route as JobTypesRouteImport } from "./routes/job-types";
 import { Route as EventsRouteImport } from "./routes/events";
 import { Route as EventTypesRouteImport } from "./routes/event-types";
 import { Route as ApplicationsRouteImport } from "./routes/applications";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as AuthCallbackRouteImport } from "./routes/auth/callback";
 
+const WorkflowStepsRoute = WorkflowStepsRouteImport.update({
+  id: "/workflow-steps",
+  path: "/workflow-steps",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const WorkflowStepTypesRoute = WorkflowStepTypesRouteImport.update({
+  id: "/workflow-step-types",
+  path: "/workflow-step-types",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const UnauthorizedRoute = UnauthorizedRouteImport.update({
   id: "/unauthorized",
   path: "/unauthorized",
   getParentRoute: () => rootRouteImport,
 } as any);
+const SubscriptionsRoute = SubscriptionsRouteImport.update({
+  id: "/subscriptions",
+  path: "/subscriptions",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const SignInRoute = SignInRouteImport.update({
   id: "/sign-in",
   path: "/sign-in",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const JobTypesRoute = JobTypesRouteImport.update({
+  id: "/job-types",
+  path: "/job-types",
   getParentRoute: () => rootRouteImport,
 } as any);
 const EventsRoute = EventsRouteImport.update({
@@ -58,8 +82,12 @@ export interface FileRoutesByFullPath {
   "/applications": typeof ApplicationsRoute;
   "/event-types": typeof EventTypesRoute;
   "/events": typeof EventsRoute;
+  "/job-types": typeof JobTypesRoute;
   "/sign-in": typeof SignInRoute;
+  "/subscriptions": typeof SubscriptionsRoute;
   "/unauthorized": typeof UnauthorizedRoute;
+  "/workflow-step-types": typeof WorkflowStepTypesRoute;
+  "/workflow-steps": typeof WorkflowStepsRoute;
   "/auth/callback": typeof AuthCallbackRoute;
 }
 export interface FileRoutesByTo {
@@ -67,8 +95,12 @@ export interface FileRoutesByTo {
   "/applications": typeof ApplicationsRoute;
   "/event-types": typeof EventTypesRoute;
   "/events": typeof EventsRoute;
+  "/job-types": typeof JobTypesRoute;
   "/sign-in": typeof SignInRoute;
+  "/subscriptions": typeof SubscriptionsRoute;
   "/unauthorized": typeof UnauthorizedRoute;
+  "/workflow-step-types": typeof WorkflowStepTypesRoute;
+  "/workflow-steps": typeof WorkflowStepsRoute;
   "/auth/callback": typeof AuthCallbackRoute;
 }
 export interface FileRoutesById {
@@ -77,8 +109,12 @@ export interface FileRoutesById {
   "/applications": typeof ApplicationsRoute;
   "/event-types": typeof EventTypesRoute;
   "/events": typeof EventsRoute;
+  "/job-types": typeof JobTypesRoute;
   "/sign-in": typeof SignInRoute;
+  "/subscriptions": typeof SubscriptionsRoute;
   "/unauthorized": typeof UnauthorizedRoute;
+  "/workflow-step-types": typeof WorkflowStepTypesRoute;
+  "/workflow-steps": typeof WorkflowStepsRoute;
   "/auth/callback": typeof AuthCallbackRoute;
 }
 export interface FileRouteTypes {
@@ -88,8 +124,12 @@ export interface FileRouteTypes {
     | "/applications"
     | "/event-types"
     | "/events"
+    | "/job-types"
     | "/sign-in"
+    | "/subscriptions"
     | "/unauthorized"
+    | "/workflow-step-types"
+    | "/workflow-steps"
     | "/auth/callback";
   fileRoutesByTo: FileRoutesByTo;
   to:
@@ -97,8 +137,12 @@ export interface FileRouteTypes {
     | "/applications"
     | "/event-types"
     | "/events"
+    | "/job-types"
     | "/sign-in"
+    | "/subscriptions"
     | "/unauthorized"
+    | "/workflow-step-types"
+    | "/workflow-steps"
     | "/auth/callback";
   id:
     | "__root__"
@@ -106,8 +150,12 @@ export interface FileRouteTypes {
     | "/applications"
     | "/event-types"
     | "/events"
+    | "/job-types"
     | "/sign-in"
+    | "/subscriptions"
     | "/unauthorized"
+    | "/workflow-step-types"
+    | "/workflow-steps"
     | "/auth/callback";
   fileRoutesById: FileRoutesById;
 }
@@ -116,13 +164,31 @@ export interface RootRouteChildren {
   ApplicationsRoute: typeof ApplicationsRoute;
   EventTypesRoute: typeof EventTypesRoute;
   EventsRoute: typeof EventsRoute;
+  JobTypesRoute: typeof JobTypesRoute;
   SignInRoute: typeof SignInRoute;
+  SubscriptionsRoute: typeof SubscriptionsRoute;
   UnauthorizedRoute: typeof UnauthorizedRoute;
+  WorkflowStepTypesRoute: typeof WorkflowStepTypesRoute;
+  WorkflowStepsRoute: typeof WorkflowStepsRoute;
   AuthCallbackRoute: typeof AuthCallbackRoute;
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/workflow-steps": {
+      id: "/workflow-steps";
+      path: "/workflow-steps";
+      fullPath: "/workflow-steps";
+      preLoaderRoute: typeof WorkflowStepsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/workflow-step-types": {
+      id: "/workflow-step-types";
+      path: "/workflow-step-types";
+      fullPath: "/workflow-step-types";
+      preLoaderRoute: typeof WorkflowStepTypesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/unauthorized": {
       id: "/unauthorized";
       path: "/unauthorized";
@@ -130,11 +196,25 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof UnauthorizedRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/subscriptions": {
+      id: "/subscriptions";
+      path: "/subscriptions";
+      fullPath: "/subscriptions";
+      preLoaderRoute: typeof SubscriptionsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/sign-in": {
       id: "/sign-in";
       path: "/sign-in";
       fullPath: "/sign-in";
       preLoaderRoute: typeof SignInRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/job-types": {
+      id: "/job-types";
+      path: "/job-types";
+      fullPath: "/job-types";
+      preLoaderRoute: typeof JobTypesRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/events": {
@@ -180,8 +260,12 @@ const rootRouteChildren: RootRouteChildren = {
   ApplicationsRoute: ApplicationsRoute,
   EventTypesRoute: EventTypesRoute,
   EventsRoute: EventsRoute,
+  JobTypesRoute: JobTypesRoute,
   SignInRoute: SignInRoute,
+  SubscriptionsRoute: SubscriptionsRoute,
   UnauthorizedRoute: UnauthorizedRoute,
+  WorkflowStepTypesRoute: WorkflowStepTypesRoute,
+  WorkflowStepsRoute: WorkflowStepsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 };
 export const routeTree = rootRouteImport
